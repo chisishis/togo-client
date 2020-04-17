@@ -1,25 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from "react";
+import "./App.css";
+
+import customTheme from "./assets/theme";
+import { createMuiTheme, ThemeProvider } from "@material-ui/core";
+
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+
+
+import UserContext from './contexts/UserContext';
+
 
 function App() {
+
+
+  const theme = createMuiTheme(customTheme);
+
+  const [user, setUser] = useState({
+    userName: 'Chris',
+    emnail: 'chisishis@gmail.com'
+  })
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={user}>
+      <ThemeProvider theme={theme}>
+        <Navbar />
+        <Home />
+      </ThemeProvider>
+    </UserContext.Provider>
   );
 }
 

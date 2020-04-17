@@ -1,0 +1,29 @@
+{
+    "'users": {
+        "createdAt": "timestamp",
+        "email": "string",
+        "level": "admin",
+        "userId": "string from user db",
+        "userName": "string"
+
+    },
+    "posts" : {
+        "title": "string",
+        "description" : "string",
+        "userName" : "string",
+        "linkUrl" : "string",
+        "imageUrl" : "string",
+        "status" : "Completed",
+        "tag" : [
+            "String",
+            "String"
+        ],
+        "dates": {
+            "createdAt" :"timestamp",
+            "plannedAt" :"timestamp",
+            "cancelledAt":"timestamp",
+            "postponedAt":"timestamp",
+            "completedAt":"timestamp"
+        }
+    }
+}
