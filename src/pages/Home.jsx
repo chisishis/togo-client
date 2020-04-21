@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Container from "@material-ui/core/Container";
 import Axios from "axios";
+
 
 import Post from '../components/Post'
 
@@ -12,7 +13,11 @@ const initialState = {
 
 
 
+
+
 const Home = () => {
+
+ 
 
   dotenv.config();
   const [posts, setPosts] = useState(initialState);
@@ -26,10 +31,14 @@ const Home = () => {
       .catch((err) => console.error(err));
   }, []);
 
+
+
   return (
     <div className="component">
       <Container maxWidth="sm" disableGutters={true}>
         <div>
+
+
           {posts.data ? (
             posts.data.map((post) => <Post key={post.postId} post={post}/>)
           ) : (

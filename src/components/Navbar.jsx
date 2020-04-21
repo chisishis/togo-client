@@ -1,16 +1,20 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { makeStyles, fade } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import UserContext from "../contexts/UserContext";
+
 import Container from "@material-ui/core/Container";
-import Add from "@material-ui/icons/Add";
 import InputBase from "@material-ui/core/InputBase";
 import SearchIcon from "@material-ui/icons/Search";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import Login from './Login';
+
+import { useAuth } from '../contexts/user.provider'
+
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,8 +74,12 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = () => {
   const classes = useStyles();
-  const user = useContext(UserContext);
+  
+  
+  const userAuth = useAuth();
+
   const [anchorEl, setAnchorEl] = useState(null);
+  
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -82,6 +90,8 @@ const Navbar = () => {
   const handleStatusMenuClose = () => {
     setAnchorEl(null);
   };
+
+  
   
   return (
     <div className={classes.root}>
@@ -89,7 +99,7 @@ const Navbar = () => {
         <Container maxWidth="lg" disableGutters={true}>
           <Toolbar className={classes.toolbar}>
             <div className={classes.user}>
-              <Typography variant="body1">Howdy {user.userName}</Typography>
+              <Typography variant="body1">Howdy {userAuth.user.userName}</Typography>
             </div>
             <div className={classes.menu}>
               <Button color="inherit">new</Button>
@@ -117,14 +127,15 @@ const Navbar = () => {
                 open={isMenuOpen}
                 onClose={handleStatusMenuClose}
               >
+              <MenuItem onClick={handleStatusMenuClose}>All</MenuItem>
                 <MenuItem onClick={handleStatusMenuClose}>Created</MenuItem>
                 <MenuItem onClick={handleStatusMenuClose}>Scheduled</MenuItem>
                 <MenuItem onClick={handleStatusMenuClose}>Completed</MenuItem>
                 <MenuItem onClick={handleStatusMenuClose}>Postponed</MenuItem>
                 <MenuItem onClick={handleStatusMenuClose}>Cancelled</MenuItem>
               </Menu>
-
-              <Button color="inherit">Logout</Button>
+              {userAuth.user.isValid? <Button color="inherit" onClick={userAuth.logout} >Logout</Button>: <Login/>}  
+             
             </div>
             <div className={classes.search}>
               <div className={classes.searchIcon}>

@@ -8,26 +8,35 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 
 
-import UserContext from './contexts/UserContext';
 
+import { UserProvider}  from './contexts/user.provider'
+
+
+
+// const tempUserInitialState = {
+//   userName: 'chris',
+//   email: 'chisishis@gmail.com',
+//   token: ''
+// }
 
 function App() {
 
-
+  
   const theme = createMuiTheme(customTheme);
 
-  const [user, setUser] = useState({
-    userName: 'Chris',
-    emnail: 'chisishis@gmail.com'
-  })
+
+    
+
+   
 
   return (
-    <UserContext.Provider value={user}>
+    <UserProvider>
       <ThemeProvider theme={theme}>
-        <Navbar />
-        <Home />
+        <Navbar/>        
+               {/* <Home />  */}
+        
       </ThemeProvider>
-    </UserContext.Provider>
+    </UserProvider>
   );
 }
 
