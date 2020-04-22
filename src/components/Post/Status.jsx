@@ -1,21 +1,11 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
-import indigo from "@material-ui/core/colors/indigo"; // planned
-import brown from "@material-ui/core/colors/brown"; // postponed
-import grey from "@material-ui/core/colors/indigo"; // cancelled
-import amber from "@material-ui/core/colors/amber"; // created
-import green from "@material-ui/core/colors/green"; //completed
+
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
+import {statusColors} from '../../util/filter.colors'
 
-const statusColors = {
-  created: amber,
-  planned: indigo,
-  postponed: brown,
-  cancelled: grey,
-  completed: green,
-};
 
 const useStyles = makeStyles((theme) => ({
   button: (props) => ({

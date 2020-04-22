@@ -31,14 +31,25 @@ export const useAuth = () => {
 
 // Custoom hook object to store auth data
 const useAuthProvider = () => {
+
+  // User State
   const [user, setUser] = useState({
     userName: "",
     email: "",
     token: "",
-    isValid: true,
+    isValid: false,
+    loading: true
   });
 
-  const [errors, setErrors] = useState({});
+  //Error State
+  const [errors, setErrors] = useState({
+    general:'',
+    password: '',
+    email: ''
+  })
+
+ 
+
   axios.defaults.baseURL =
     "https://us-central1-togo-b7cd6.cloudfunctions.net/app";
 
@@ -47,24 +58,23 @@ const useAuthProvider = () => {
       email: email,
       password: password,
     };
-    
+   
     axios
       .post("/login", userInput)
       .then((res) => {
-
         const newUser = {
-            userName: res.data.userName,
-            email: res.data.email,
-            toke: res.data.token,
-            isValid: true
-        }
-        
+          userName: res.data.userName,
+          email: res.data.email,
+          token: res.data.token,
+          isValid: true,
+          loading: false,
+        };
         setUser(newUser);
         
       })
-      .catch((err) => {
-        setErrors({ errors: err.response.data });
-        setUser({ isValid: false });
+      .catch((e) => {     
+        setUser({isValid: false});
+        setErrors (e.response.data)     
       });
   };
 
@@ -75,16 +85,17 @@ const useAuthProvider = () => {
       email: "",
       token: "",
       isValid: false,
+      loading: true
     });
+    setErrors({});
   };
 
   useEffect(() => {
     if (user.token) {
       const decoded = jwtDecode(user.token);
       if (decoded.exp * 1000 < Date.now()) {
+        console.log("token is invalid")
         setUser({ isvalid: false });
-      } else {
-        setUser({ isValid: true });
       }
     } else {
       setUser({ isValid: false });
@@ -92,7 +103,7 @@ const useAuthProvider = () => {
   }, [user.token]);
 
   return {
-    user,
+    user,    
     errors,
     login,
     logout,
