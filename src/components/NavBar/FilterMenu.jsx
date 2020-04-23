@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
 import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { statusColors } from "../../util/filter.colors";
 import FormGroup from "@material-ui/core/FormGroup";
 import Divider from "@material-ui/core/Divider";
+
+import { useFilter } from "../../contexts/user.filter.provider";
 
 const useStyle = makeStyles((theme) => ({
   all: {
@@ -53,14 +53,7 @@ const useStyle = makeStyles((theme) => ({
 const FilterMenu = () => {
   const classes = useStyle();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [filter, setFilter] = useState({
-    all: true,
-    created: true,
-    planned: true,
-    postponed: true,
-    cancelled: true,
-    completed: true,
-  });
+  const { filter, setFilter } = useFilter();
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -74,58 +67,55 @@ const FilterMenu = () => {
 
   const handleChange = (e) => {
     const name = e.target.name;
+    const tempValue = filter[name];
+
+    let tempFilter = {
+      all: false,
+      created: false,
+      planned: false,
+      postponed: false,
+      cancelled: false,
+      completed: false,
+    };
 
     // check if all is checked
     if (name === "all") {
-      if (filter[name] === false) {
-        setFilter({
-          all: true,
-          created: true,
-          planned: true,
-          postponed: true,
-          cancelled: true,
-          completed: true,
-        });
-      } else {
-        setFilter({
-          all: false,
-          created: false,
-          planned: false,
-          postponed: false,
-          cancelled: false,
-          completed: false,
-        });
-      }
+      Object.keys(tempFilter).forEach((key) => {
+        tempFilter[key] = !tempValue;
+      });
     } else {
-      // if something else was checked.
-      setFilter({ ...filter, all: false, [e.target.name]: e.target.checked });
+      tempFilter = { ...filter, [e.target.name]: e.target.checked };
     }
+
+    if (
+      // check 'All' button when other elements checked
+      tempFilter.created &&
+      tempFilter.planned &&
+      tempFilter.completed &&
+      tempFilter.postponed &&
+      tempFilter.cancelled &&
+      !tempFilter.all
+    ) {
+      tempFilter = { ...tempFilter, all: true };
+    }
+    if (
+      // un-check 'All' button when other elements unchecked
+      !(
+        tempFilter.created &&
+        tempFilter.planned &&
+        tempFilter.completed &&
+        tempFilter.postponed &&
+        tempFilter.cancelled
+      ) &&
+      tempFilter.all
+    ) {
+      tempFilter = { ...tempFilter, all: false };
+    }    
+    setFilter({ ...tempFilter });
+    
   };
 
-
   // Control a side effect after state change
-  useEffect(() => {
-    if (
-      filter.created &&
-      filter.planned &&
-      filter.completed &&
-      filter.postponed &&
-      filter.cancelled &&
-      !filter.all
-    ) {
-      setFilter({ ...filter, all: true });
-    }
-    if (
-      !filter.created &&
-      !filter.planned &&
-      !filter.completed &&
-      !filter.postponed &&
-      !filter.cancelled &&
-      filter.all
-    ) {
-      setFilter({ ...filter, all: false });
-    }
-  }, [filter]);
 
   return (
     <React.Fragment>
@@ -220,6 +210,7 @@ const FilterMenu = () => {
             label="Cancelled"
           />
         </FormGroup>
+    
       </Menu>
     </React.Fragment>
   );

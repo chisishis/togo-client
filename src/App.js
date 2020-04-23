@@ -7,31 +7,22 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 import Navbar from "./components/NavBar/Navbar";
 import Home from "./pages/Home";
 
+import { UserProvider } from "./contexts/user.provider";
+import { FilterProvider } from "./contexts/user.filter.provider";
 
-
-import { UserProvider}  from './contexts/user.provider'
-
-
-
-// const tempUserInitialState = {
-//   userName: 'chris',
-//   email: 'chisishis@gmail.com',
-//   token: ''
-// }
 
 function App() {
-
-  
-  const theme = createMuiTheme(customTheme);  
+  const theme = createMuiTheme(customTheme);
 
   return (
-    <UserProvider>
-      <ThemeProvider theme={theme}>
-        <Navbar/>        
-               {/* <Home />  */}
-        
-      </ThemeProvider>
-    </UserProvider>
+    <FilterProvider>
+      <UserProvider>
+        <ThemeProvider theme={theme}>
+          <Navbar />
+          <Home />
+        </ThemeProvider>
+      </UserProvider>
+    </FilterProvider>
   );
 }
 

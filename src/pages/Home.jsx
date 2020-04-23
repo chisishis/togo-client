@@ -1,73 +1,69 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "@material-ui/core/Container";
 import Axios from "axios";
-import Post from '../components/Post/Post'
+import Post from "../components/Post/Post";
 
+import { useFilter } from "../contexts/user.filter.provider";
 
-
-const initialPost = {
-  data: null,
-};
-
-// set initial state for sort order
-// date
-// userName
-const initialOrder = {
-  order : 'date'
-}
-
-// set initial state for filter
-// All
-// Created
-// Planned
-// Completed
-// Postponed
-// 
-
-const initialFilter = {
-  all: true,
-  created: false,
-  planned: false,
-  completed: false,
-  postponed: false,
-  cancelled: false
-
-}
-
-const dataFetch  = async (orderBy, filterBy) => {    
-  try {
-    const fetchData = await Axios("https://us-central1-togo-b7cd6.cloudfunctions.net/app/posts");
-    return fetchData.data;
-  }
-  catch (err) {
-    console.error(err);
-  }
-}
+// const initialOrder = {
+//   order : 'date'
+// }
 
 const Home = () => {
+  const { filter } = useFilter();
+  const [posts, setPosts] = useState([]);
+  const [isFirstTime, setIsFirstTime] = useState(true);
 
-  
-  const [posts, setPosts] = useState(initialPost);
-  const [order, setOrder] = useState(initialOrder);
-  const [filter, setFilter] = useState(initialFilter);
+  const fetchDataFromDb = () => {
+    let filterQuery = "";
 
-  // Fetch the database on mounting
-  useEffect(() => {
-    Axios.get("https://us-central1-togo-b7cd6.cloudfunctions.net/app/posts")
+    for (let [key, value] of Object.entries(filter)) {
+      if (value) {
+        switch (key) {
+          case "all":
+            filterQuery = "a";
+            break;
+          case "created":
+            filterQuery += "c";
+            break;
+          case "planned":
+            filterQuery += "p";
+            break;
+          case "completed":
+            filterQuery += "o";
+            break;
+          case "postponed":
+            filterQuery += "n";
+            break;
+          case "cancelled":
+            filterQuery += "x";
+            break;
+          default:
+        }
+      }
+    }
+
+    console.log(filter);
+    Axios.get(
+      `https://us-central1-togo-b7cd6.cloudfunctions.net/app/posts/${filterQuery}`
+    )
       .then((res) => {
-        setPosts({ data: res.data });
+        setPosts(res.data);
       })
       .catch((err) => console.error(err));
-  }, []);
+  };
 
-
+  // Fetch the database on mounting only
+  useEffect(() => {
+    fetchDataFromDb();
+  }, [filter]);
 
   return (
     <div className="component">
       <Container maxWidth="sm" disableGutters={true}>
         <div>
-          {posts.data ? (
-            posts.data.map((post) => <Post key={post.postId} post={post}/>)
+          {posts ? (
+            posts.map((post) => <Post key={post.postId} post={post} />)
           ) : (
             <p>loading</p>
           )}
