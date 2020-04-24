@@ -23,7 +23,7 @@ const useFilterProvider = () => {
         completed: true,
     })
 
-    const isChanged = false;
+  
 
-    return {isChanged, filter, setFilter}
+    return {filter, setFilter}
 }

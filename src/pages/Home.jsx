@@ -12,8 +12,6 @@ import { useFilter } from "../contexts/user.filter.provider";
 const Home = () => {
   const { filter } = useFilter();
   const [posts, setPosts] = useState([]);
-  const [isFirstTime, setIsFirstTime] = useState(true);
-
   const fetchDataFromDb = () => {
     let filterQuery = "";
 
@@ -62,11 +60,11 @@ const Home = () => {
     <div className="component">
       <Container maxWidth="sm" disableGutters={true}>
         <div>
-          {posts ? (
+          {/* {posts ? (
             posts.map((post) => <Post key={post.postId} post={post} />)
           ) : (
             <p>loading</p>
-          )}
+          )} */}
         </div>
       </Container>
     </div>
