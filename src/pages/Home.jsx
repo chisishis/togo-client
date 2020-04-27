@@ -60,6 +60,7 @@ const Home = () => {
     <div className="component">
       <Container maxWidth="sm" disableGutters={true}>
         <div>
+   
           {/* {posts ? (
             posts.map((post) => <Post key={post.postId} post={post} />)
           ) : (

@@ -1,58 +1,43 @@
 import React, { useState } from "react";
-import Container from "@material-ui/core/Container";
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, Divider  } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
-import TextareaAutosize from "@material-ui/core/TextareaAutosize";
-import Modal from "@material-ui/core/Modal";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/Modal";
-import StepContent from "@material-ui/core/StepContent";
-import Stepper from "@material-ui/core/Stepper";
-import Paper from "@material-ui/core/Paper";
 
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import InputBase from "@material-ui/core/InputBase";
 
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
 
+import {isUrl} from "../../utils/util"
 
+import CancelButton from "./CancelButton";
 
 import { useAuth } from "../../contexts/user.provider";
 
+import urlMetadata from 'url-metadata'
+
+
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    marginTop: 200,
-    textAlign: "center",
-    backgroundColor: "#eef",
-    padding: 50,
-  },
-  modal: {
-    position: "absolute",
-    width: 400,
-  },
-  form: {
-    textAlign: "center",
-  },
-  image: {
-    maxWidth: 64,
-    margin: "20px auto 20px auto",
-  },
-  pageTitle: {
-    margin: "10px auto 10px auto",
-  },
+ 
   textField: {
-    margin: "10px auto 10px auto",
+    margin: "0px auto 0px auto",
   },
   textArea: {
-    margin: "10px auto 10px auto",
-    witdh: '100%'
+    margin: "0px auto 0px auto",
+
   },
-  button: {
-    marginTop: 20,
-    position: "relative",
-  },
+
   customError: {
     color: "red",
     fontSize: "0.8rem",
@@ -64,33 +49,45 @@ const useStyles = makeStyles((theme) => ({
   stepperButton: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
+  },
+  button: {
+    width: '100%',    
+  },
 
+  backDrop: {
+    background: "rgba(255,255,255,0.7)",
+  },
+  link: {
+    margin: 8,
+    background: "#F2F3F5"
   }
 }));
 
-const getSteps =  () => ['Create a post', 'Make a plan'];
+const getSteps = () => ["Create a post", "Make a plan"];
 const getStepContent = (step) => {
-    switch (step) {
-        case 0: return 'Automatically Created';
-        case 1: return 'Pick a date for the plan. You can go back to step-1 if you do not want to make a plan now';
-        default:
-        return 'Unknown Step'
-    }
-}
+  switch (step) {
+    case 0:
+      return "Automatically Created";
+    case 1:
+      return "Pick a date for the plan. You can go back to step-1 if you do not want to make a plan now";
+    default:
+      return "Unknown Step";
+  }
+};
 
 const NewPost = () => {
   const classes = useStyles();
   const auth = useAuth();
   const authErrors = auth.errors;
   const authUser = auth.user;
-    const steps = getSteps();
+  const steps = getSteps();
 
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false);
   const [errors, setErrors] = useState({
     url: "",
     title: "",
@@ -104,6 +101,7 @@ const NewPost = () => {
     description: "",
     pictureUrl: "",
     status: "created",
+    inputText: '',
     dates: {
       created: new Date().toDateString(),
       planned: "",
@@ -115,7 +113,16 @@ const NewPost = () => {
   });
 
   const [activeStep, setActiveStep] = useState();
-   
+
+  const [link, setLink] = useState({
+    url: '',
+    title: '',
+    description: '',
+    imageUrl:''
+
+
+  })
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -128,162 +135,121 @@ const NewPost = () => {
     setActiveStep(0);
   };
 
-
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
+  const toggleDialog = () => {
+    setDialogOpen(!isDialogOpen);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
   };
 
   const handleChange = (e) => {
-    setPost({ ...post, [e.target.name]: e.target.value });
-  };
 
+    const inputText = e.target.value;
+    const inputFragment = inputText.split(' ');  
+    const result = inputFragment.filter (sentence => isUrl(sentence));     
+    if (result[0]) {
+      urlMetadata('http://bit.ly/2ePIrDy').then(
+  function (metadata) { // success handler
+    console.log(metadata)
+  },
+  function (error) { // failure handler
+    console.log(error)
+  })
+      
+      setLink({url:result[0]})
 
-
-  const ModalBody = (
-    <Container
-      maxWidth="md"
-      disableGutters={true}
-      className={classes.formControl}
-    >
-      <Typography variant="h4">NEW POST</Typography>
-      <form noValidate onSubmit={handleSubmit}>
-        <TextField
-          id="url"
-          name="url"
-          type="text"
-          label="URL"
-          className={classes.textField}
-          helperText={errors.url}
-          error={errors.url ? true : false}
-          value={post.url}
-          defaultValue="Title, Description and ImageUrl will be set when this field is filled"
-          onChange={handleChange}
-          fullWidth
-          required
-        />
-        <TextField
-          id="title"
-          name="title"
-          type="text"
-          label="Title"
-          className={classes.textField}
-          helperText={errors.title}
-          error={errors.title ? true : false}
-          value={post.title}
-          onChange={handleChange}
-          fullWidth
-          required
-        />
+    }
     
 
-        <TextField
-          id="description"
-          name="description"
-          type="text"
-          label="Description"
-          className={classes.textArea}
-          helperText={errors.description}
-          error={errors.description ? true : false}
-          value={post.description}
-          onChange={handleChange}
-          fullWidth
-          multiline
-          required
-        />
 
+    setPost({ ...post, inputText: inputText});
+  };
 
-        <TextField
-          id="image"
-          name="image"
-          type="text"
-          label="Image Url"
-          className={classes.textArea}
-          helperText={errors.image}
-          error={errors.image ? true : false}
-          value={post.imageUrl}
-          onChange={handleChange}
-          fullWidth
-          multiline
-          required
-        />  
-        
-      {/* <Stepper activeStep={activeStep} orientation="vertical">
-        {steps.map((label, index) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-            <StepContent>
-              <Typography>{getStepContent(index)}</Typography>
-              <div className={classes.actionsContainer}>
-                <div>
-                  <Button
-                    disabled={activeStep === 0}
-                    onClick={handleBack}
-                    className={classes.stepperButton}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    className={classes.stepperButton}
-                  >
-                    {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                  </Button>
-                </div>
-              </div>
-            </StepContent>
-          </Step>
-        ))}
-      </Stepper>
-      {activeStep === steps.length && (
-        <Paper square elevation={0} className={classes.resetContainer}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-          <Button onClick={handleReset} className={classes.stepperButton}>
-            Reset
-          </Button>
-        </Paper>
-      )}
-     */}
-      
+  const NewPostTitle = () => {
+    return (
+      <DialogTitle id="login-dialog-title">
+        <Typography variant="h5" component="span">
+          CreatePost
+        </Typography>
+        <CancelButton clickHandler={toggleDialog} />
+      </DialogTitle>
+    );
+  };
+
+  const NewPostActions = () => {
+    return (
+      <DialogActions>
         <Button
           type="submit"
           variant="contained"
           color="primary"
+          onClick={handleSubmit}
           className={classes.button}
-          disabled={authUser.loading}
+          fullWidth
         >
-
-          Submit
-          {authUser.loading && (
-            <CircularProgress size={30} className={classes.progress} />
-          )}
+          POST
         </Button>
-      </form>
-    </Container>
-  );
+      </DialogActions>
+    );
+  };
+
+
 
   return (
     <React.Fragment>
-      <Button color="inherit" onClick={handleModalOpen}>
+      <Button color="inherit" onClick={toggleDialog}>
         NEW
       </Button>
-      <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="Login"
+      <Dialog
+        open={isDialogOpen}
+        fullWidth
+        maxWidth="sm"
+        onClose={toggleDialog}
+        aria-labelledby="login-dialog-title"
+        scroll="paper"
+        BackdropProps={{
+          classes: {
+            root: classes.backDrop,
+          },
+        }}
       >
-        {ModalBody}
-      </Modal>
+        <NewPostTitle />
+        <Divider/>
+        <DialogContent>
+          <Typography variant="h6">{authUser.userName}ss</Typography>
+
+          <InputBase
+            id="description"
+            name="description"
+            type="text"
+            label="Description"
+            className={classes.textArea}            
+            error={errors.description ? true : false}
+            value={post.inputText}
+            onChange={handleChange}
+            fullWidth
+            multiline
+            rows={6}
+            rowsMax={6}
+            required
+            autoFocus
+          />
+
+           
+        </DialogContent>
+
+         <Card className={classes.link}>
+            
+              <CardMedia />
+              <CardContent>
+                {link.url?link.url:'space'}
+              </CardContent>
+       
+          </Card>
+        
+        <NewPostActions />
+      </Dialog>
     </React.Fragment>
   );
 };

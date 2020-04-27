@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { makeStyles } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -17,6 +17,7 @@ import Search from "./Search";
 import { useAuth } from "../../contexts/user.provider";
 
 
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -30,10 +31,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 const Navbar = () => {
   const classes = useStyles();
   const userAuth = useAuth();
-  
+  const [currentFilter, setFilter] = useState('a');  
   
   return (
     <AppBar className={classes.root} position="fixed">
