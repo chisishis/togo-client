@@ -51,8 +51,7 @@ const useAuthProvider = () => {
   
  
 
-  axios.defaults.baseURL =
-    "https://us-central1-togo-b7cd6.cloudfunctions.net/app";
+    
 
   const login = (email, password) => {
     const userInput = {
@@ -61,7 +60,7 @@ const useAuthProvider = () => {
     };
    
     axios
-      .post("/login", userInput)
+      .post("https://us-central1-togo-b7cd6.cloudfunctions.net/app/login", userInput)
       .then((res) => {
         const newUser = {
           userName: res.data.userName,

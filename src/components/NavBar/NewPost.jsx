@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
-import { makeStyles, Divider  } from "@material-ui/core";
+import { makeStyles, Divider } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 
@@ -19,23 +19,21 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 
-import {isUrl} from "../../utils/util"
+import { isUrl } from "../../util/validUrl";
 
 import CancelButton from "./CancelButton";
 
 import { useAuth } from "../../contexts/user.provider";
 
-import urlMetadata from 'url-metadata'
-
+import Axios from "axios";
+import fetchMeta from "../../util/fetch.meta.data";
 
 const useStyles = makeStyles((theme) => ({
- 
   textField: {
     margin: "0px auto 0px auto",
   },
   textArea: {
     margin: "0px auto 0px auto",
-
   },
 
   customError: {
@@ -51,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   button: {
-    width: '100%',    
+    width: "100%",
   },
 
   backDrop: {
@@ -59,8 +57,17 @@ const useStyles = makeStyles((theme) => ({
   },
   link: {
     margin: 8,
-    background: "#F2F3F5"
-  }
+    background: "#F2F3F5",
+  },
+  media: {
+    height: 240,
+  },
+  title: {
+    color: "#444",
+  },
+  url: {
+    color: "#777",
+  },
 }));
 
 const getSteps = () => ["Create a post", "Make a plan"];
@@ -101,7 +108,7 @@ const NewPost = () => {
     description: "",
     pictureUrl: "",
     status: "created",
-    inputText: '',
+    inputText: "",
     dates: {
       created: new Date().toDateString(),
       planned: "",
@@ -115,13 +122,11 @@ const NewPost = () => {
   const [activeStep, setActiveStep] = useState();
 
   const [link, setLink] = useState({
-    url: '',
-    title: '',
-    description: '',
-    imageUrl:''
-
-
-  })
+    url: "",
+    title: "",
+    description: "",
+    imageUrl: "",
+  });
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -143,27 +148,17 @@ const NewPost = () => {
     e.preventDefault();
   };
 
-  const handleChange = (e) => {
-
+  const handleChange = async (e) => {
     const inputText = e.target.value;
-    const inputFragment = inputText.split(' ');  
-    const result = inputFragment.filter (sentence => isUrl(sentence));     
-    if (result[0]) {
-      urlMetadata('http://bit.ly/2ePIrDy').then(
-  function (metadata) { // success handler
-    console.log(metadata)
-  },
-  function (error) { // failure handler
-    console.log(error)
-  })
-      
-      setLink({url:result[0]})
+    const inputFragment = inputText.split(" ");
+    const result = inputFragment.filter((sentence) => isUrl(sentence))[0];
 
+    if (result && !link.url) {
+      // Todo: fetch API to grab OG data
+      const response = await fetchMeta(result);
+      setLink(response);
     }
-    
-
-
-    setPost({ ...post, inputText: inputText});
+    setPost({ ...post, inputText: inputText });
   };
 
   const NewPostTitle = () => {
@@ -194,8 +189,6 @@ const NewPost = () => {
     );
   };
 
-
-
   return (
     <React.Fragment>
       <Button color="inherit" onClick={toggleDialog}>
@@ -215,16 +208,16 @@ const NewPost = () => {
         }}
       >
         <NewPostTitle />
-        <Divider/>
+        <Divider />
         <DialogContent>
-          <Typography variant="h6">{authUser.userName}ss</Typography>
+          <Typography variant="h6">{authUser.userName}</Typography>
 
           <InputBase
             id="description"
             name="description"
             type="text"
             label="Description"
-            className={classes.textArea}            
+            className={classes.textArea}
             error={errors.description ? true : false}
             value={post.inputText}
             onChange={handleChange}
@@ -235,19 +228,39 @@ const NewPost = () => {
             required
             autoFocus
           />
-
-           
         </DialogContent>
 
-         <Card className={classes.link}>
-            
-              <CardMedia />
-              <CardContent>
-                {link.url?link.url:'space'}
-              </CardContent>
-       
-          </Card>
-        
+        <Card className={classes.link}>
+          <CardMedia
+            className={classes.media}
+            component="img"
+            alt="link image"
+            image={link.imageUrl}
+            title={link.title}
+          />
+          <CardContent>
+            <Typography className={classes.url} variant="body2" align="left">
+              {link.url.toUpperCase()}
+            </Typography>
+            <Typography
+              className={classes.title}
+              gutterBottom
+              variant="h6"
+              component="h2"
+            >
+              {link.title}
+            </Typography>
+            <Typography
+              className={classes.title}
+              gutterBottom
+              variant="body2"
+              component="p"
+            >
+              {link.description}
+            </Typography>
+          </CardContent>
+        </Card>
+
         <NewPostActions />
       </Dialog>
     </React.Fragment>
