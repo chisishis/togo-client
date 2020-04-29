@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 
-import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
 import { makeStyles, Divider } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import InputBase from "@material-ui/core/InputBase";
 
 import Card from "@material-ui/core/Card";
-import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 
@@ -26,7 +22,6 @@ import CancelButton from "./CancelButton";
 import { useAuth } from "../../contexts/user.provider";
 
 import Axios from "axios";
-import fetchMeta from "../../util/fetch.meta.data";
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -70,24 +65,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const getSteps = () => ["Create a post", "Make a plan"];
-const getStepContent = (step) => {
-  switch (step) {
-    case 0:
-      return "Automatically Created";
-    case 1:
-      return "Pick a date for the plan. You can go back to step-1 if you do not want to make a plan now";
-    default:
-      return "Unknown Step";
-  }
-};
-
 const NewPost = () => {
   const classes = useStyles();
   const auth = useAuth();
-  const authErrors = auth.errors;
   const authUser = auth.user;
-  const steps = getSteps();
 
   const [user, setUser] = useState({
     email: "",
@@ -103,12 +84,8 @@ const NewPost = () => {
   });
 
   const [post, setPost] = useState({
-    url: "",
-    title: "",
-    description: "",
-    pictureUrl: "",
     status: "created",
-    inputText: "",
+    memo: "",
     dates: {
       created: new Date().toDateString(),
       planned: "",
@@ -119,26 +96,14 @@ const NewPost = () => {
     tag: [],
   });
 
-  const [activeStep, setActiveStep] = useState();
-
   const [link, setLink] = useState({
-    url: "",
+    linkUrl: "",
     title: "",
     description: "",
     imageUrl: "",
+    isValid: false,
+    
   });
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
 
   const toggleDialog = () => {
     setDialogOpen(!isDialogOpen);
@@ -146,19 +111,54 @@ const NewPost = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    //console.log(post, link);
+    console.log({...post, ...link})
+    auth.post({...post,...link});
   };
 
-  const handleChange = async (e) => {
-    const inputText = e.target.value;
-    const inputFragment = inputText.split(" ");
-    const result = inputFragment.filter((sentence) => isUrl(sentence))[0];
+  const shortenUrl = (longUrl) => {
+    const result = longUrl
+      .split("/")
+      .filter((fragment) => fragment.includes("."))[0];
 
-    if (result && !link.url) {
+    // console.log(result);
+
+    return result;
+  };
+
+  const handleChange = (e) => {
+    const memo = e.target.value;
+    const inputFragment = memo.split(" ");
+    const result = inputFragment.filter((sentence) => isUrl(sentence))[0];
+    setPost({ ...post, memo: memo });
+
+    if (result) {
       // Todo: fetch API to grab OG data
-      const response = await fetchMeta(result);
-      setLink(response);
+      const enocodedUrl = encodeURIComponent(result);
+      Axios.get(`http://localhost:4000/ogp/${enocodedUrl}`).then((res) => {
+        // console.log(res);
+
+        // if the page is not found, set isValid to false, the card will not be shown up.
+        if (res.data.error) {
+          //console.log('error message:' + res.data.requestUrl);
+          setLink({
+            isValid: false,
+          });
+        } else {
+          const { ogUrl, ogImage, ogTitle, ogDescription } = res.data.data;
+          setLink({
+            title: ogTitle ? ogTitle : "OG data not found ",
+            imageUrl: ogImage.url,
+            description: ogDescription ? ogDescription : "OG data not found ",
+            linkUrl: ogUrl ? shortenUrl(ogUrl) : shortenUrl(enocodedUrl),
+            isValid: true,
+          });
+        }
+      });
+
+      //
+      //    setLink(response);
     }
-    setPost({ ...post, inputText: inputText });
   };
 
   const NewPostTitle = () => {
@@ -219,7 +219,7 @@ const NewPost = () => {
             label="Description"
             className={classes.textArea}
             error={errors.description ? true : false}
-            value={post.inputText}
+            value={post.memo}
             onChange={handleChange}
             fullWidth
             multiline
@@ -229,37 +229,44 @@ const NewPost = () => {
             autoFocus
           />
         </DialogContent>
-
-        <Card className={classes.link}>
-          <CardMedia
-            className={classes.media}
-            component="img"
-            alt="link image"
-            image={link.imageUrl}
-            title={link.title}
-          />
-          <CardContent>
-            <Typography className={classes.url} variant="body2" align="left">
-              {link.url.toUpperCase()}
-            </Typography>
-            <Typography
-              className={classes.title}
-              gutterBottom
-              variant="h6"
-              component="h2"
-            >
-              {link.title}
-            </Typography>
-            <Typography
-              className={classes.title}
-              gutterBottom
-              variant="body2"
-              component="p"
-            >
-              {link.description}
-            </Typography>
-          </CardContent>
-        </Card>
+        {link.isValid ? (
+          <Card className={classes.link}>
+            {link.imageUrl ? (
+              <CardMedia
+                className={classes.media}
+                component="img"
+                alt="link image"
+                image={link.imageUrl}
+                title={link.title}
+              />
+            ) : (
+              <div></div>
+            )}
+            <CardContent>
+              <Typography className={classes.url} variant="body2" align="left">
+                {link.linkUrl.toUpperCase()}
+              </Typography>
+              <Typography
+                className={classes.title}
+                gutterBottom
+                variant="h6"
+                component="h2"
+              >
+                {link.title}
+              </Typography>
+              <Typography
+                className={classes.title}
+                gutterBottom
+                variant="body2"
+                component="p"
+              >
+                {link.description}
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : (
+          <div></div>
+        )}
 
         <NewPostActions />
       </Dialog>

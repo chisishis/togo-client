@@ -50,7 +50,19 @@ const useAuthProvider = () => {
 
   
  
-
+  const post = (userData) => {
+    const header = {headers: {Authorization : `Bearer ${user.token}`}};
+    console.log(header)
+    axios
+      .post("https://us-central1-togo-b7cd6.cloudfunctions.net/app/post", userData, header)
+      .then( res => {
+        console.log(res.data);
+      })
+      .catch((e) => {     
+        setErrors (e.response.data)     
+        console.log(e.response.data);
+      });
+  }
     
 
   const login = (email, password) => {
@@ -107,5 +119,6 @@ const useAuthProvider = () => {
     errors,
     login,
     logout,
+    post,
   };
 };

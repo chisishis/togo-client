@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
     cancelIcon: {
       position: "absolute",
       top: 6,
-      right: 24,
+      right: 8,
       textAlign: "right",
     },
   }));
