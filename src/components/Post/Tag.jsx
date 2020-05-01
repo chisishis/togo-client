@@ -16,7 +16,7 @@ const useStyles = makeStyles( theme => ({
                 color: blueGrey[700], 
             }
         },
-        margin: theme.spacing(1)
+        margin: theme.spacing(0)
        
     }
 }))

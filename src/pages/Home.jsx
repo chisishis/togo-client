@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Container from "@material-ui/core/Container";
-import Axios from "axios";
+
 import Post from "../components/Post/Post";
 
-import { useFilter } from "../contexts/user.filter.provider";
+import { useFilter } from "../contexts/filter.provider";
+import { usePost } from "../contexts/post.provider";
+
+
+
 
 // const initialOrder = {
 //   order : 'date'
@@ -11,64 +15,26 @@ import { useFilter } from "../contexts/user.filter.provider";
 
 const Home = () => {
   const { filter } = useFilter();
-  const [posts, setPosts] = useState([]);
-  const fetchDataFromDb = () => {
-    let filterQuery = "";
+  const { getPosts,posts,isLoading } = usePost();  
 
-    for (let [key, value] of Object.entries(filter)) {
-      if (value) {
-        switch (key) {
-          case "all":
-            filterQuery = "a";
-            break;
-          case "created":
-            filterQuery += "c";
-            break;
-          case "planned":
-            filterQuery += "p";
-            break;
-          case "completed":
-            filterQuery += "o";
-            break;
-          case "postponed":
-            filterQuery += "n";
-            break;
-          case "cancelled":
-            filterQuery += "x";
-            break;
-          default:
-        }
-      }
-    }
-
-    console.log(filter);
-    Axios.get(
-      `https://us-central1-togo-b7cd6.cloudfunctions.net/app/posts/${filterQuery}`
-    )
-      .then((res) => {
-        setPosts(res.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  // Fetch the database on mounting only
+  //Fetch the database on mounting only
   useEffect(() => {
-    fetchDataFromDb();
-  }, [filter]);
+    getPosts(filter);    
+  },[filter]);
 
-  return (
-    <div className="component">
-      <Container maxWidth="sm" disableGutters={true}>
-        <div>
-   
-          {/* {posts ? (
+  return (  
+      <div className="component">
+        <Container maxWidth="sm" disableGutters={true}>
+          <div>
+            {!isLoading ? (
             posts.map((post) => <Post key={post.postId} post={post} />)
           ) : (
             <p>loading</p>
-          )} */}
-        </div>
-      </Container>
-    </div>
+          )}
+          </div>
+        </Container>
+      </div>
+   
   );
 };
 

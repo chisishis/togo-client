@@ -1,6 +1,9 @@
-import React, { createContext, useState, useEffect, useContext} from 'react';
+import React, { createContext, useState, useContext} from 'react';
 
 const FilterContext = createContext();
+
+
+
 
 
 export const FilterProvider = ({ children }) => {
@@ -13,17 +16,21 @@ export const useFilter = () => {
 }
 
 
+
 const useFilterProvider = () => {
     const [filter, setFilter] = useState({
+      
         all: true,
         created: true,
         planned: true,
         postponed: true,
         cancelled: true,
-        completed: true,
+        completed: true
+
     })
 
-  
-
+    
     return {filter, setFilter}
 }
+
+

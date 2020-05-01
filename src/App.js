@@ -8,8 +8,8 @@ import Navbar from "./components/NavBar/Navbar";
 import Home from "./pages/Home";
 
 import { UserProvider } from "./contexts/user.provider";
-import { FilterProvider } from "./contexts/user.filter.provider";
-
+import { FilterProvider } from "./contexts/filter.provider";
+import { PostProvider } from "./contexts/post.provider";
 
 function App() {
   const theme = createMuiTheme(customTheme);
@@ -18,8 +18,10 @@ function App() {
     <FilterProvider>
       <UserProvider>
         <ThemeProvider theme={theme}>
-          <Navbar />
-          <Home />
+        <PostProvider> 
+          <Navbar />              
+          <Home />            
+          </PostProvider>
         </ThemeProvider>
       </UserProvider>
     </FilterProvider>

@@ -14,10 +14,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 import DialogActions from "@material-ui/core/DialogActions";
 
-
-
-
-
 import { useAuth } from "../../contexts/user.provider";
 
 const useStyles = makeStyles((theme) => ({
@@ -63,7 +59,7 @@ const Login = () => {
 
     const { email, password } = user;
     auth.login(email, password);
-    if (authUser.isValid) {
+    if (auth.isValid) {
       setDialogOpen(false);
     } else {
       setUser({ email: "", password: "" });

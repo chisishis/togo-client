@@ -11,7 +11,7 @@ Context provider for user auth.
 
 */
 
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useContext } from "react";
 
 import jwtDecode from "jwt-decode";
 import axios from "axios";
@@ -31,48 +31,34 @@ export const useAuth = () => {
 
 // Custoom hook object to store auth data
 const useAuthProvider = () => {
-
   // User State
   const [user, setUser] = useState({
     userName: "",
     email: "",
     token: "",
     isValid: false,
-    loading: true
+    loading: false,
   });
 
   //Error State
   const [errors, setErrors] = useState({
-    general:'',
-    password: '',
-    email: ''
-  })
+    general: "",
+    password: "",
+    email: "",
+  });
 
-  
- 
-  const post = (userData) => {
-    const header = {headers: {Authorization : `Bearer ${user.token}`}};
-    console.log(header)
-    axios
-      .post("https://us-central1-togo-b7cd6.cloudfunctions.net/app/post", userData, header)
-      .then( res => {
-        console.log(res.data);
-      })
-      .catch((e) => {     
-        setErrors (e.response.data)     
-        console.log(e.response.data);
-      });
-  }
-    
 
   const login = (email, password) => {
     const userInput = {
       email: email,
       password: password,
     };
-   
+
     axios
-      .post("https://us-central1-togo-b7cd6.cloudfunctions.net/app/login", userInput)
+      .post(
+        "https://us-central1-togo-b7cd6.cloudfunctions.net/app/login",
+        userInput
+      )
       .then((res) => {
         const newUser = {
           userName: res.data.userName,
@@ -81,12 +67,12 @@ const useAuthProvider = () => {
           isValid: true,
           loading: false,
         };
+        console.log(newUser);
         setUser(newUser);
-        
       })
-      .catch((e) => {     
-        setUser({isValid: false});
-        setErrors (e.response.data)     
+      .catch((e) => {
+        setUser({ isValid: false });
+        setErrors(e.data);
       });
   };
 
@@ -97,28 +83,40 @@ const useAuthProvider = () => {
       email: "",
       token: "",
       isValid: false,
-      loading: true
+      loading: true,
     });
     setErrors({});
   };
 
-  useEffect(() => {
+
+  
+  const isTokenValid = () => {
+    // check if the user has a token
     if (user.token) {
+      // check if the uer token is not expired
       const decoded = jwtDecode(user.token);
-      if (decoded.exp * 1000 < Date.now()) {
-        console.log("token is invalid")
+      if (decoded.exp * 1000 > Date.now()) {
+        setUser({ isValid: true });
+        return true;
+      } else {
+        console.log("token is invalid");
         setUser({ isvalid: false });
+        return false;
       }
     } else {
       setUser({ isValid: false });
+      return false;
     }
-  }, [user.token]);
+  };
+
+
 
   return {
-    user,    
+    user,
     errors,
     login,
     logout,
-    post,
+    
+    isTokenValid,
   };
 };

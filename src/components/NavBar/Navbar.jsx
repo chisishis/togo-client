@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -35,8 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = () => {
   const classes = useStyles();
-  const userAuth = useAuth();
-  const [currentFilter, setFilter] = useState('a');  
+  const userAuth = useAuth();  
   
   return (
     <AppBar className={classes.root} position="fixed">
@@ -44,7 +43,8 @@ const Navbar = () => {
         <Toolbar className={classes.toolbar}>
           <Greetings className={classes.userGreetings}/>
           <Box component="span" className={classes.menu}>
-            <NewPost />
+            {userAuth.user.isValid ? <NewPost token={userAuth.user.token} userName={userAuth.user.userName}/> : <span></span> }
+            
             <FilterMenu />    
             {userAuth.user.isValid? <Button color="inherit" onClick={userAuth.logout} >Logout</Button>: <Login/>}   
            

@@ -8,7 +8,7 @@ import { statusColors } from "../../util/filter.colors";
 import FormGroup from "@material-ui/core/FormGroup";
 import Divider from "@material-ui/core/Divider";
 
-import { useFilter } from "../../contexts/user.filter.provider";
+import { useFilter } from "../../contexts/filter.provider";
 
 const useStyle = makeStyles((theme) => ({
   all: {
@@ -51,9 +51,13 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 const FilterMenu = () => {
+
+
   const classes = useStyle();
   const [anchorEl, setAnchorEl] = useState(null);
   const { filter, setFilter } = useFilter();
+
+  const filterMap = new Map()
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -65,8 +69,14 @@ const FilterMenu = () => {
     setAnchorEl(null);
   };
 
+  
+
   const handleChange = (e) => {
-    const name = e.target.name;
+
+      const name = e.target.name;
+    
+    
+    
     const tempValue = filter[name];
 
     let tempFilter = {

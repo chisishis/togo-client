@@ -19,7 +19,9 @@ import { isUrl } from "../../util/validUrl";
 
 import CancelButton from "./CancelButton";
 
-import { useAuth } from "../../contexts/user.provider";
+import { usePost } from "../../contexts/post.provider";
+
+import {shortenUrl} from "../../util/utils"
 
 import Axios from "axios";
 
@@ -65,25 +67,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const NewPost = () => {
+const NewPost = ({token, userName}) => {
   const classes = useStyles();
-  const auth = useAuth();
-  const authUser = auth.user;
-
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
-
+  const { postNew } = usePost();
+  
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const [errors, setErrors] = useState({
-    url: "",
-    title: "",
-    description: "",
-    dates: "",
-  });
 
-  const [post, setPost] = useState({
+  const [newPost, setNewPost] = useState({
     status: "created",
     memo: "",
     dates: {
@@ -102,7 +92,6 @@ const NewPost = () => {
     description: "",
     imageUrl: "",
     isValid: false,
-    
   });
 
   const toggleDialog = () => {
@@ -111,26 +100,15 @@ const NewPost = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    //console.log(post, link);
-    console.log({...post, ...link})
-    auth.post({...post,...link});
-  };
-
-  const shortenUrl = (longUrl) => {
-    const result = longUrl
-      .split("/")
-      .filter((fragment) => fragment.includes("."))[0];
-
-    // console.log(result);
-
-    return result;
+    postNew({ ...newPost, ...link }, token);
+    setDialogOpen(!isDialogOpen);
   };
 
   const handleChange = (e) => {
     const memo = e.target.value;
     const inputFragment = memo.split(" ");
     const result = inputFragment.filter((sentence) => isUrl(sentence))[0];
-    setPost({ ...post, memo: memo });
+    setNewPost({ ...newPost, memo: memo });
 
     if (result) {
       // Todo: fetch API to grab OG data
@@ -148,9 +126,9 @@ const NewPost = () => {
           const { ogUrl, ogImage, ogTitle, ogDescription } = res.data.data;
           setLink({
             title: ogTitle ? ogTitle : "OG data not found ",
-            imageUrl: ogImage.url,
+            imageUrl: ogImage.url ? ogImage.url : '',
             description: ogDescription ? ogDescription : "OG data not found ",
-            linkUrl: ogUrl ? shortenUrl(ogUrl) : shortenUrl(enocodedUrl),
+            linkUrl: ogUrl ? ogUrl : "OG data not found",
             isValid: true,
           });
         }
@@ -210,16 +188,16 @@ const NewPost = () => {
         <NewPostTitle />
         <Divider />
         <DialogContent>
-          <Typography variant="h6">{authUser.userName}</Typography>
+          <Typography variant="h6">{userName}</Typography>
 
           <InputBase
             id="description"
             name="description"
             type="text"
             label="Description"
+            placeholder="paste URL to browse the data "
             className={classes.textArea}
-            error={errors.description ? true : false}
-            value={post.memo}
+            value={newPost.memo}
             onChange={handleChange}
             fullWidth
             multiline
@@ -244,7 +222,7 @@ const NewPost = () => {
             )}
             <CardContent>
               <Typography className={classes.url} variant="body2" align="left">
-                {link.linkUrl.toUpperCase()}
+                {shortenUrl(link.linkUrl).toUpperCase()}
               </Typography>
               <Typography
                 className={classes.title}

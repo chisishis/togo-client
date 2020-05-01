@@ -10,10 +10,11 @@ import {statusColors} from '../../util/filter.colors'
 const useStyles = makeStyles((theme) => ({
   button: (props) => ({
     color: "#fff",
-    margin: theme.spacing(1),
+    
+    
     backgroundColor: props.statusColor[500],
     "&:hover": {
-      backgroundColor: props.statusColor[700],
+      backgroundColor: props.statusColor[600],
       "@media (hover : none)": {
         backgroundColor: props.statusColor[500],
       },
@@ -30,7 +31,7 @@ const Status = ({ status, date}) => {
   const classes = useStyles({ statusColor });
  
   return (
-    <React.Fragment>
+  
     <Button
       key={status}
       variant="contained"
@@ -39,12 +40,9 @@ const Status = ({ status, date}) => {
       align="right"
       className={classes.button}
     >
-      {status}
+      {status} : {date}
     </Button>
-    <Typography variant='body2' component='span' className={classes.text}>
-      {date}
-    </Typography>
-    </React.Fragment>
+    
   );
 };
 
