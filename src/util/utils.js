@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const shortenUrl = (longUrl) => {
     const result = longUrl
       .split("/")
@@ -5,3 +7,7 @@ export const shortenUrl = (longUrl) => {
 
     return result;
   };
+
+
+export const convertDate = (date) => dayjs(date).format("MMM DD, YYYY ");
+  

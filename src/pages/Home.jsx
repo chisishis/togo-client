@@ -1,40 +1,43 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "@material-ui/core/Container";
+
 
 import Post from "../components/Post/Post";
 
-import { useFilter } from "../contexts/filter.provider";
+
 import { usePost } from "../contexts/post.provider";
 
-
-
-
 // const initialOrder = {
-//   order : 'date'
+//   order : 'date's
 // }
 
+
 const Home = () => {
-  const { filter } = useFilter();
-  const { getPosts,posts,isLoading } = usePost();  
+  
+  const { action, filter, fetchPosts, posts } = usePost();  
+  
+  const [isLoading, setLoading] = useState(true);
+  
+  
+
 
   //Fetch the database on mounting only
   useEffect(() => {
-    getPosts(filter);    
-  },[filter]);
+    fetchPosts(filter);
+    setLoading(false)    
+  },[action]);
 
-  return (  
-      <div className="component">
-        <Container maxWidth="sm" disableGutters={true}>
-          <div>
+  console.log('home render')
+  return (       
+        <Container className="component" maxWidth="sm" disableGutters={true}>        
+      
             {!isLoading ? (
-            posts.map((post) => <Post key={post.postId} post={post} />)
+            posts.map((post) => <Post  key={post.postId} post={post} />)
           ) : (
             <p>loading</p>
-          )}
-          </div>
-        </Container>
-      </div>
-   
+          )}      
+          
+        </Container>   
   );
 };
 

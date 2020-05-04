@@ -6,5 +6,7 @@ const isUrl = (url) => {
 
 }
 
-export {isUrl};
+const isTag = (sentence) => sentence.startsWith('#');
+
+export {isUrl, isTag};
 

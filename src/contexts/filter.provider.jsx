@@ -1,36 +1,30 @@
-import React, { createContext, useState, useContext} from 'react';
+import React, { createContext, useState, useContext } from "react";
 
 const FilterContext = createContext();
 
-
-
-
-
 export const FilterProvider = ({ children }) => {
-    const filter = useFilterProvider();
-    return <FilterContext.Provider value={filter}> {children} </FilterContext.Provider>
-}
+  const post = useFilterProvider();
+  return (
+    <FilterContext.Provider value={post}>{children}</FilterContext.Provider>
+  );
+};
 
 export const useFilter = () => {
-    return useContext(FilterContext);
-}
-
-
+  return useContext(FilterContext);
+};
 
 const useFilterProvider = () => {
-    const [filter, setFilter] = useState({
-      
-        all: true,
-        created: true,
-        planned: true,
-        postponed: true,
-        cancelled: true,
-        completed: true
+  const [filter, setFilter] = useState({
+    all: true,
+    created: true,
+    planned: true,
+    postponed: true,
+    cancelled: true,
+    completed: true,
+  });
 
-    })
-
-    
-    return {filter, setFilter}
-}
-
-
+  return {
+    filter,
+    setFilter,
+  };
+};

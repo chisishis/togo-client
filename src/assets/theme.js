@@ -1,21 +1,21 @@
+
 //  Customized theme for MUI
 
 const theme = {
     palette: {
         primary: {
-            light: '#62727b',
-            main : '#37474f',
-            dark : '#102027'
+            light: '#534bae',
+            main : '#1a237e',
+            dark : '#000051'
             
         },
         secondary: {
-            light: '#8e8e8e',
-            main: '#616161',
-            dark: '#373737'
+            light: '#ff5c8d',
+            main: '#d81b60',
+            dark: '#a00037'
             
         }
-    }
-
+    },
 
 }
 

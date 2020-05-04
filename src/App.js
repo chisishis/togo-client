@@ -7,24 +7,29 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 import Navbar from "./components/NavBar/Navbar";
 import Home from "./pages/Home";
 
-import { UserProvider } from "./contexts/user.provider";
-import { FilterProvider } from "./contexts/filter.provider";
 import { PostProvider } from "./contexts/post.provider";
+import { UserProvider } from "./contexts/user.provider";
 
 function App() {
   const theme = createMuiTheme(customTheme);
+  console.log('app render')
 
-  return (
-    <FilterProvider>
-      <UserProvider>
+
+
+
+  return ( 
+     
         <ThemeProvider theme={theme}>
-        <PostProvider> 
+          <UserProvider>
+        <PostProvider>
+       
           <Navbar />              
-          <Home />            
+          <Home />        
           </PostProvider>
+          </UserProvider>
         </ThemeProvider>
-      </UserProvider>
-    </FilterProvider>
+        
+     
   );
 }
 

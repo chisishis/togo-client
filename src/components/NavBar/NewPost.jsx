@@ -15,13 +15,15 @@ import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 
-import { isUrl } from "../../util/validUrl";
+import { isUrl, isTag } from "../../util/validUrl";
 
 import CancelButton from "./CancelButton";
 
-import { usePost } from "../../contexts/post.provider";
+
 
 import {shortenUrl} from "../../util/utils"
+
+import { usePost } from '../../contexts/post.provider'
 
 import Axios from "axios";
 
@@ -69,7 +71,8 @@ const useStyles = makeStyles((theme) => ({
 
 const NewPost = ({token, userName}) => {
   const classes = useStyles();
-  const { postNew } = usePost();
+
+  const { postNew }= usePost();
   
   const [isDialogOpen, setDialogOpen] = useState(false);
 
@@ -100,19 +103,26 @@ const NewPost = ({token, userName}) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    postNew({ ...newPost, ...link }, token);
+   
+    const postArray = newPost.memo.split(/\s+/);
+    const hashTag = postArray.filter( word => isTag(word)&& word.slice(1));
+    const memo = postArray.filter(( word ) => !isTag(word) && !isUrl(word) && word).join(' ');
+
+    postNew({ ...newPost, ...link, memo: memo, tag: hashTag }, token);
     setDialogOpen(!isDialogOpen);
   };
 
   const handleChange = (e) => {
     const memo = e.target.value;
     const inputFragment = memo.split(" ");
-    const result = inputFragment.filter((sentence) => isUrl(sentence))[0];
+    const url = inputFragment.filter((sentence) => isUrl(sentence))[0];
+   
+
     setNewPost({ ...newPost, memo: memo });
 
-    if (result) {
+    if (url) {
       // Todo: fetch API to grab OG data
-      const enocodedUrl = encodeURIComponent(result);
+      const enocodedUrl = encodeURIComponent(url);
       Axios.get(`http://localhost:4000/ogp/${enocodedUrl}`).then((res) => {
         // console.log(res);
 
