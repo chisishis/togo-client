@@ -11,7 +11,7 @@ Context provider for user auth.
 
 */
 
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 import jwtDecode from "jwt-decode";
 import axios from "axios";
@@ -36,9 +36,12 @@ const useAuthProvider = () => {
     userName: "",
     email: "",
     token: "",
+    userId: "",
     isValid: false,
     loading: false,
   });
+
+
 
   //Error State
   const [errors, setErrors] = useState({
@@ -46,7 +49,6 @@ const useAuthProvider = () => {
     password: "",
     email: "",
   });
-
 
   const login = (email, password) => {
     const userInput = {
@@ -64,10 +66,15 @@ const useAuthProvider = () => {
           userName: res.data.userName,
           email: res.data.email,
           token: res.data.token,
+          userId: res.data.userId,
           isValid: true,
           loading: false,
         };
-        console.log(newUser);
+        localStorage.setItem('userName',newUser.userName);
+        localStorage.setItem('email',newUser.email);
+        localStorage.setItem('token', newUser.token);
+        localStorage.setItem('userId', newUser.userId)
+        
         setUser(newUser);
       })
       .catch((e) => {
@@ -85,16 +92,18 @@ const useAuthProvider = () => {
       isValid: false,
       loading: true,
     });
+    localStorage.removeItem('token');
+    localStorage.removeItem('email');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userId');
     setErrors({});
   };
 
-
-  
-  const isTokenValid = () => {
+  const isTokenValid = (token = user.token) => {
     // check if the user has a token
-    if (user.token) {
+    if (token) {
       // check if the uer token is not expired
-      const decoded = jwtDecode(user.token);
+      const decoded = jwtDecode(token);
       if (decoded.exp * 1000 > Date.now()) {
         setUser({ isValid: true });
         return true;
@@ -109,14 +118,25 @@ const useAuthProvider = () => {
     }
   };
 
-
+  useEffect(()=>{
+    if (isTokenValid(localStorage.getItem('token'))) {
+      setUser( {
+        userName: localStorage.getItem('userName'),
+        email: localStorage.getItem('email'),
+        token: localStorage.getItem('token'),
+        userId: localStorage.getItem('userId'),
+        isValid: true,
+        loading: false
+      })
+    }
+    
+  },[])
 
   return {
     user,
     errors,
     login,
     logout,
-    
     isTokenValid,
   };
 };

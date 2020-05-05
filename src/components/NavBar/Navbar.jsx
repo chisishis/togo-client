@@ -43,10 +43,10 @@ const Navbar = () => {
         <Toolbar className={classes.toolbar}>
           <Greetings className={classes.userGreetings}/>
           <Box component="span" className={classes.menu}>
-            {userAuth.user.isValid ? <NewPost token={userAuth.user.token} userName={userAuth.user.userName}/> : <span></span> }
+            {userAuth.user.isValid && <NewPost token={userAuth.user.token} userName={userAuth.user.userName}/>}
             
             <FilterMenu />    
-            {userAuth.user.isValid? <Button color="inherit" onClick={userAuth.logout} >Logout</Button>: <Login/>}   
+            {userAuth.user.isValid ? <Button color="inherit" onClick={userAuth.logout} >Logout</Button>: <Login/>}   
            
             
           </Box>

@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 
-
+//MUI Components
 import CardContent from "@material-ui/core/CardContent";
-
-
 import Typography from "@material-ui/core/Typography";
 import CardHeader from "@material-ui/core/CardHeader";
 import Avatar from "@material-ui/core/Avatar";
@@ -14,13 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 import Chip from "@material-ui/core/Chip";
 import Paper from "@material-ui/core/Paper";
-
-import ConfirmButton from "../elements/ConfirmButton";
-import PostActionArea from "./PostActionArea"
-
-
 import Dialog from "@material-ui/core/Dialog";
-
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -31,17 +23,25 @@ import ScheduleIcon from "@material-ui/icons/Schedule";
 import LabelIcon from "@material-ui/icons/Label";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import PublicIcon from '@material-ui/icons/Public';
+import LockIcon from '@material-ui/icons/Lock';
+import PeopleIcon from '@material-ui/icons/People';
 
+
+// Utils
 import { convertDate } from "../../util/utils";
+import dayjs from "dayjs";
 
+// Context Consumers
 import { usePost } from "../../contexts/post.provider";
-
 import { useAuth } from "../../contexts/user.provider";
 
+// Custom Components
 import Tag from "./Tag";
 import Status from "./Status";
-
-import dayjs from "dayjs";
+import ConfirmButton from "../elements/ConfirmButton";
+import PostActionArea from "./PostActionArea";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,12 +49,8 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     borderRadius: 8,
   },
-  
-  status: {
-    flexGrow: 1,
-  },
-  tags: {
-    flexGrow: 1,
+  avatar: {
+    fontSize: '1.6rem'
   },
 
   memo: {
@@ -63,9 +59,7 @@ const useStyles = makeStyles((theme) => ({
   name: {
     margin: "0px 5px 5px 2px",
   },
- 
 
-  avatar: {},
   chiproot: {
     display: "flex",
     justifyContent: "center",
@@ -85,103 +79,106 @@ const Post = ({ post }) => {
     postId,
     title,
     description,
-    userName,
+    ownerName,
     linkUrl,
     imageUrl,
-    status,
     tag,
     memo,
-    dates,
+    history,
+    shareWith
   } = post;
 
   const classes = useStyles();
+
+  // destuct date from context
   const userToken = useAuth().user.token;
+  const loggedInUser = useAuth().user.userName;
   const { deletePost, updateTag, updateMemo } = usePost();
 
-  // state and functions for more menu
-  const [moreMenuEl, setMoreMenuEl] = useState(null);
-  const [newTag, setNewTag] = useState("");
-  const [tempMemo, setTempMemo] = useState(memo);
-
-  const handleMoreMenu = (event) => {
-    setMoreMenuEl(event.currentTarget);
-  };
-
-  const closeMoreMenu = () => {
-    setMoreMenuEl(null);
-  };
-
-  const [tempTag, setTempTag] = useState(tag);
-
-  // state and function for
-
+  // local states
+  const [anchorEl, setAnchorEl] = useState(null); // Side Menu Elements
+  const [inputTag, setInputTag] = useState("");
+  const [inputMemo, setInputMemo] = useState(memo);
+  const [tempTag, setTempTag] = useState(tag); // states from database
   const [isOpen, setOpen] = useState({
+    // states for Side Menu
     tag: false,
     status: false,
     delete: false,
     memo: false,
   });
 
-  const handleTagMenu = (event) => {
-    const targetEl = event.currentTarget.name;
-    setOpen({ ...isOpen, tag: !isOpen.tag });
-    closeMoreMenu();
+  // Controls Side Menu
+  const handleMoreMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    if (targetEl === "save") {
-      updateTag(postId, userToken, tempTag);
+  const closeMoreMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleUpdate = (target) => () => {
+    switch (target) {
+      case "tag": {
+        updateTag(postId, userToken, tempTag);
+        break;
+      }
+      case "delete": {
+        deletePost(postId, userToken);
+        break;
+      }
+      case "memo": {
+        updateMemo(postId, userToken, inputMemo);
+        break;
+      }
+      default: {
+      }
     }
-  };
-
-  const handleDelete = (event) => {
-    const targetEl = event.currentTarget.name;
-    setOpen({ ...isOpen, delete: !isOpen.delete });
+    setOpen({ ...isOpen, [target]: !isOpen[target] });
     closeMoreMenu();
-
-    if (targetEl === "delete") {
-      deletePost(postId, userToken);
-    }
   };
 
-  const handleMemoMenu = (event) => {
-    const targetEl = event.currentTarget.name;
-    setOpen({ ...isOpen, memo: !isOpen.memo });
-    closeMoreMenu();
+  // Controls open-close Dialogs
 
-    if (targetEl === "memo") {
-      updateMemo(postId, userToken, tempMemo);
-    }
+  const toggleDialog = (value) => () => {
+    if (isOpen[value]) closeMoreMenu();
+    setOpen({ ...isOpen, [value]: !isOpen[value] });
   };
 
-  const handleMemoChange = (event) => {
-    setTempMemo(event.target.value);
-  };
-  const handleChipDelete = (target) => () => {
+  // Functions for Tag
+
+  const handleDeleteChip = (target) => () => {
+    // Remove a tag from array and update state
     const tempArray = tempTag.filter((singleTag) => singleTag !== target);
     setTempTag(tempArray);
   };
 
-  const handleChipAdd = (e) => {
-    const tagString = e.target.value;
-    // set a tag first
-
+  const handleAddChip = (event) => {
+    const tagString = event.target.value;
     // push to array if string has a space at the end
     if (tagString.endsWith(" ")) {
-      const tagTrimmed = tagString.trim();
-
-      setTempTag([...tempTag, tagTrimmed]);
-      setNewTag("");
+      setTempTag([...tempTag, tagString.trim()]);
+      setInputTag("");
     } else {
-      setNewTag(tagString);
+      setInputTag(tagString);
     }
   };
 
+  // Functions for Memo
+
+  const handleChangeMemo = (event) => {
+    setInputMemo(event.target.value);
+  };
+
+  
+
   const CardAvatar = (
     <Avatar aria-label="recipe" className={classes.avatar}>
-      {String(userName).toUpperCase()[0]}
+      {String(ownerName).toUpperCase()[0]}
     </Avatar>
   );
 
-  const CardActionButton = (
+  const CardActionButton = ownerName === loggedInUser && (
     <IconButton
       aria-label="settings"
       name="delete-post"
@@ -191,64 +188,155 @@ const Post = ({ post }) => {
     </IconButton>
   );
 
-  const MoreMenu = (props) => <Menu {...props} />;
-  MoreMenu.muiName = "Menu";
+  // Functions for General
+  const ShareWith = () => {
+    
+  
+    switch (shareWith[0]) {
+      case 'Public' : {
+        return (
+          <IconButton size='small'>
+          <PublicIcon/>
+        </IconButton>
+          )
+          
+        
+      }
+      case 'OnlyMe' : {
+        return(
+        <IconButton size='small'>
+          <LockIcon/>
+        </IconButton>)
+      }
+      case 'Friends' : {
+       return ( <IconButton size='small'>
+          <PeopleIcon/>
+        </IconButton>)
+      }
+      default:
 
-  const moreMenuItems = [
-    {
-      handler: handleTagMenu,
-      text: 'Edit Tag',
-    },
-    {
-      handler: handleMemoMenu,
-      text: 'Edit Memo',
-    },
-    {
-      handler: handleDelete,
-      text: 'Delet Post',
     }
-  ]
 
+  }
+    
+  const subHeader =     
+      <div>
+        {dayjs(history[0].date).format("MMM DD, YYYY")}&nbsp;
+        <ShareWith/>
+      </div>
+      
+    
+ 
+
+  
+  
   return (
     <Card id={postId} className={classes.root}>
       <CardHeader
         avatar={CardAvatar}
         action={CardActionButton}
-        title={userName}
-        subheader={dayjs(dates.createdAt).format("MMM DD, YYYY")}
+        title={ownerName}
+        subheader={subHeader}
       />
 
       <Menu
         id="post-menu"
-        anchorEl={moreMenuEl}
+        anchorEl={anchorEl}
         keepMounted
-        open={Boolean(moreMenuEl)}
+        open={Boolean(anchorEl)}
         onClose={closeMoreMenu}
       >
-        
-        <MenuItem onClick={handleTagMenu}>
+        <MenuItem onClick={toggleDialog("tag")}>
           <ListItemIcon>
             <LabelIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Edit Tag" />
         </MenuItem>
-        <MenuItem onClick={handleMemoMenu}>
+        <MenuItem onClick={toggleDialog("memo")}>
           <ListItemIcon>
             <ScheduleIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Edit Memo" />
         </MenuItem>
-        <MenuItem onClick={handleDelete}>
+        <MenuItem onClick={toggleDialog("delete")}>
           <ListItemIcon>
             <DeleteIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Delete Post" />
         </MenuItem>
       </Menu>
+
+      <Dialog
+        fullWidth
+        open={isOpen.tag}
+        onClose={toggleDialog("tag")}
+        aria-labelledby="tag-dialog-title"
+        aria-describedby="tag-dialog-description"
+      >
+        <DialogTitle id="tag-dialog-title">{"Add / Remove a Tag."}</DialogTitle>
+        <DialogContent>
+          <Paper elevation={0} component="ul" className={classes.chiproot}>
+            {tempTag.map((tag) => (
+              <li key={tag}>
+                <Chip
+                  className={classes.chip}
+                  label={tag}
+                  color="primary"
+                  onDelete={handleDeleteChip(tag)}
+                />
+              </li>
+            ))}
+          </Paper>
+
+          <TextField
+            id="add-tag"
+            label="Add new tag"
+            variant="outlined"
+            value={inputTag}
+            fullWidth
+            onChange={handleAddChip}
+          />
+        </DialogContent>
+        <ConfirmButton
+          message="Save"
+          name="save"
+          clickHandler={handleUpdate("tag")}
+          cancelHandler={toggleDialog("tag")}
+        />
+      </Dialog>
+
+      <Dialog
+        id="edit-memo-dialog"
+        open={isOpen.memo}
+        onClose={toggleDialog("memo")}
+        aria-labelledby="memo-dialog-title"
+        aria-describedby="memo-dialog-description"
+        fullWidth
+      >
+        <DialogTitle id="memo-dialog-title">{"Edit Memo"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            multiline
+            id="edit-memo"
+            label=""
+            variant="outlined"
+            value={inputMemo}
+            fullWidth
+            onChange={handleChangeMemo}
+          />
+        </DialogContent>
+        <ConfirmButton
+          message="Save"
+          name="memo"
+          clickHandler={handleUpdate("memo")}
+          cancelHandler={toggleDialog("memo")}
+        />
+      </Dialog>
+
       <Dialog
         id="delete-post-dialog"
         open={isOpen.delete}
-        onClose={handleDelete}
+        onClose={toggleDialog("delete")}
         aria-labelledby="deleete-dialog-title"
         aria-describedby="delete-dialog-description"
         fullWidth
@@ -263,75 +351,8 @@ const Post = ({ post }) => {
         <ConfirmButton
           message="Delete"
           name="delete"
-          clickHandler={handleDelete}
-        />
-      </Dialog>
-
-      <Dialog
-        id="edit-memo-dialog"
-        open={isOpen.memo}
-        onClose={handleMemoMenu}
-        aria-labelledby="memo-dialog-title"
-        aria-describedby="memo-dialog-description"
-        fullWidth
-      >
-        <DialogTitle id="memo-dialog-title">{"Edit Memo"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            multiline
-            id="edit-memo"
-            label=""
-            variant="outlined"
-            value={tempMemo}
-            fullWidth
-            onChange={handleMemoChange}
-          />
-        </DialogContent>
-        <ConfirmButton
-          message="Save"
-          name="memo"
-          clickHandler={handleMemoMenu}
-        />
-      </Dialog>
-
-      <Dialog
-        fullWidth
-        id="update-tag-dialog"
-        open={isOpen.tag}
-        onClose={handleTagMenu}
-        aria-labelledby="tag-dialog-title"
-        aria-describedby="tag-dialog-description"
-      >
-        <DialogTitle id="tag-dialog-title">
-          {"Add or remove a tag."}
-        </DialogTitle>
-        <DialogContent>
-          <Paper elevation={0} component="ul" className={classes.chiproot}>
-            {tempTag.map((singleTab) => (
-              <li key={singleTab}>
-                <Chip
-                  className={classes.chip}
-                  label={singleTab}
-                  color="primary"
-                  onDelete={handleChipDelete(singleTab)}
-                />
-              </li>
-            ))}
-          </Paper>
-
-          <TextField
-            id="add-tag"
-            label="Add new tag"
-            variant="outlined"
-            value={newTag}
-            fullWidth
-            onChange={handleChipAdd}
-          />
-        </DialogContent>
-        <ConfirmButton
-          message="Save"
-          name="save"
-          clickHandler={handleTagMenu}
+          clickHandler={handleUpdate("delete")}
+          cancelHandler={toggleDialog("delete")}
         />
       </Dialog>
 
@@ -340,15 +361,20 @@ const Post = ({ post }) => {
           {memo}
         </Typography>
         <Typography align="right">
-          <Status status={status} date={convertDate(dates[status + "At"])} />
+          <Status
+            status={history[history.length - 1].name}
+            date={dayjs(history[history.length - 1].date) .format("MMM DD, YYYY")}
+          />
         </Typography>
       </CardContent>
+      <Divider />
+      <PostActionArea
+        image={imageUrl}
+        link={linkUrl}
+        description={description}
+        title={title}
+      />
 
-
-
-      <PostActionArea image={imageUrl} link={linkUrl} description={description} title={title} />
-    
-      
       <CardContent>
         <Typography
           xs={12}

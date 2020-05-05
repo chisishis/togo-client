@@ -2,22 +2,20 @@ import React from "react";
 import { makeStyles } from "@material-ui/core";
 
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
 
-import {statusColors} from '../../util/filter.colors'
+import {statusColors} from '../../assets/statusColors'
 
 
 const useStyles = makeStyles((theme) => ({
   button: (props) => ({
     marginTop: 10,
-    color: "#fff",
+    color: "#fff",    
     
-    
-    backgroundColor: props.statusColor[500],
+    backgroundColor: props.statusColor.main,
     "&:hover": {
-      backgroundColor: props.statusColor[600],
+      backgroundColor: props.statusColor.dark,
       "@media (hover : none)": {
-        backgroundColor: props.statusColor[500],
+        backgroundColor: props.statusColor.main,
       },
     },
   }),

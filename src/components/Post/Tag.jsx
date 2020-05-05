@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core';
 import blueGrey from '@material-ui/core/colors/blueGrey'; 
 import Button from '@material-ui/core/Button';
-
+import { usePost } from "../../contexts/post.provider";
 
 
 const useStyles = makeStyles( theme => ({
@@ -22,9 +22,10 @@ const useStyles = makeStyles( theme => ({
 }))
 
 const Tag = ({tagItem}) => {
+    const { searchTag } = usePost();
     const classes = useStyles();
     return (
-        <Button size='small' key={tagItem} className={classes.tag}>{tagItem}</Button>
+        <Button size='small' key={tagItem} className={classes.tag} onClick={()=>searchTag(tagItem)}>{tagItem}</Button>
     )
 
 }

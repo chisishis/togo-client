@@ -5,20 +5,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import PropTypes from 'prop-types';
 
-import { makeStyles } from "@material-ui/core";
-
-
-
 
 const ConfirmButton = ({
+  cancelHandler,
   clickHandler,
   message,
   name
 }) => {
-
-    const classes = makeStyles({
-
-    });
 
   return (
 <DialogActions >
@@ -30,10 +23,9 @@ const ConfirmButton = ({
       >
         {message}
       </Button>
-      <Button
-       
+      <Button       
         name="cancel"
-        onClick={clickHandler}
+        onClick={cancelHandler}
         color="secondary"
         autoFocus
       >
@@ -45,6 +37,7 @@ const ConfirmButton = ({
 
 ConfirmButton.protoType = {
     clickHandler: PropTypes.func.isRequired,
+    cancelHandler: PropTypes.func.isRequired,
     message: PropTypes.oneOf(['Save','Update','Delete']).isRequired,
     name: PropTypes.string.isRequired
 }

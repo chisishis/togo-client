@@ -1,38 +1,36 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core";
 
 import { shortenUrl } from "../../util/utils";
 
-import PropTypes from "prop-types";
-
-import { makeStyles } from "@material-ui/core";
+const useStyle = makeStyles({
+  url: {
+    color: "#aaa",
+  },
+  title: {
+    textTransform: "capitalize",
+  },
+});
 
 const PostActionArea = ({ image, title, link, description }) => {
-  const classes = makeStyles({
-    media: {
-      height: 240,
-    },
-    url: {
-      color: "#aaa",
-    },
-    title: {
-      textTransform: "capitalize",
-    },
-    cardAction: {
-      backgroundColor: "#f8f8f8",
-    },
-  });
+  const classes = useStyle();
+  const openWindow = () => {
+    window.open(link, "_blank");
+  };
 
   return (
-    <CardActionArea className={classes.cardAction}>
+    <CardActionArea onClick={openWindow}>
       {image !== "" && (
         <CardMedia
           className={classes.media}
           component="img"
+          height="240"
           alt="spot image"
           image={image}
           title={title}

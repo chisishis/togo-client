@@ -12,24 +12,16 @@ import { UserProvider } from "./contexts/user.provider";
 
 function App() {
   const theme = createMuiTheme(customTheme);
-  console.log('app render')
 
-
-
-
-  return ( 
-     
-        <ThemeProvider theme={theme}>
-          <UserProvider>
+  return (
+    <ThemeProvider theme={theme}>
+      <UserProvider>
         <PostProvider>
-       
-          <Navbar />              
-          <Home />        
-          </PostProvider>
-          </UserProvider>
-        </ThemeProvider>
-        
-     
+          <Navbar />
+          <Home />
+        </PostProvider>
+      </UserProvider>
+    </ThemeProvider>
   );
 }
 

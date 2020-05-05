@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Container from "@material-ui/core/Container";
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -27,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 16,
   },
   progress: {
-    position: "absolute",
+    position: "relative",
   },
 }));
 
@@ -45,10 +44,8 @@ const Login = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
 
   const toggleDialog = () => {
-    setDialogOpen(!isDialogOpen)
-  }
-
-
+    setDialogOpen(!isDialogOpen);
+  };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
@@ -67,6 +64,7 @@ const Login = () => {
   };
 
   const handleChange = (e) => {
+    
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
@@ -80,13 +78,13 @@ const Login = () => {
         Login
       </Button>
       <Dialog
-      className = {classes.dialog}
+        className={classes.dialog}
         open={isDialogOpen}
         onClose={handleDialogClose}
         aria-labelledby="dialog-title"
-        fullWidth        
+        fullWidth
       >
-        <DialogTitle id="dialog-title" >Login</DialogTitle>
+        <DialogTitle id="dialog-title">Login</DialogTitle>
         <DialogContent>
           <TextField
             id="email"
@@ -100,7 +98,7 @@ const Login = () => {
             onChange={handleChange}
             fullWidth
             autoFocus
-            margin='dense'
+            margin="dense"
             required
           />
           <TextField
@@ -123,41 +121,34 @@ const Login = () => {
           )}
 
           <DialogActions>
-            
             <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            className={classes.button}
-            disabled={authUser.loading}
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              className={classes.button}
+              disabled={authUser.loading}
             >
-            Login
-            
+              Login
             </Button>
 
             <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            onClick={handleDialogClose}
-            className={classes.button}
-            disabled={authUser.loading}
+              type="button"
+              variant="contained"
+              color="primary"
+              onClick={handleDialogClose}
+              className={classes.button}
+              disabled={authUser.loading}
             >
-            Cancel
-        
+              Cancel
             </Button>
-            
-            </DialogActions>
-          
-       
-            </DialogContent>
-            {authUser.loading && (
-              <CircularProgress size={30} className={classes.progress} />
-            )}
-            
+          </DialogActions>
+        </DialogContent>
+        {authUser.loading && (
+          <CircularProgress size={30} className={classes.progress} />
+        )}
       </Dialog>
-      </>
+    </>
   );
 };
 
