@@ -1,0 +1,16 @@
+const userActionTypes = {
+    SET_CURRENT_USER: 'SET_CURRENT_USER',
+    CHECK_USER_SESSION: 'CHECK_USER_SESSION', // Check if token is not exprired
+    
+    SIGN_IN_START: 'SIGN_IN_START',
+    SIGN_IN_SUCCESS: 'SIGN_IN_SUCCESS',
+    SIGN_IN_FAILURE: 'SIGN_IN_FAILURE',
+
+    SIGN_OUT_START: 'SIGN_OUT_START',
+    SIGN_OUT_SUCCESS: 'SIGN_OUT_SUCCESS',
+    SIGN_OUT_FAILURE: 'SIGN_OUT_FAILURE',
+
+}
+
+export default userActionTypes;
+

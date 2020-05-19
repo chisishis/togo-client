@@ -7,6 +7,8 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 import Navbar from "./components/NavBar/Navbar";
 import Home from "./pages/Home";
 
+
+
 import { PostProvider } from "./contexts/post.provider";
 import { UserProvider } from "./contexts/user.provider";
 
@@ -18,7 +20,7 @@ function App() {
       <UserProvider>
         <PostProvider>
           <Navbar />
-          <Home />
+          {/* <Home /> */}
         </PostProvider>
       </UserProvider>
     </ThemeProvider>

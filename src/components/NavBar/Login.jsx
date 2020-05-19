@@ -13,7 +13,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 import DialogActions from "@material-ui/core/DialogActions";
 
-import { useAuth } from "../../contexts/user.provider";
+import { connect } from 'react-redux';
+
+import {  signInStart } from '../../redux/user/user.actions'
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -30,11 +32,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Login = () => {
+const Login = ({isValid, loading, error, signInStart}) => {
   const classes = useStyles();
-  const auth = useAuth();
-  const authErrors = auth.errors;
-  const authUser = auth.user;
 
   const [user, setUser] = useState({
     email: "",
@@ -53,10 +52,10 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const { email, password } = user;
-    auth.login(email, password);
-    if (auth.isValid) {
+    
+    console.log(user)
+    signInStart(user);
+    if (isValid) {
       setDialogOpen(false);
     } else {
       setUser({ email: "", password: "" });
@@ -92,8 +91,8 @@ const Login = () => {
             type="email"
             label="Email"
             className={classes.textField}
-            helperText={authErrors.email}
-            error={authErrors.email ? true : false}
+            helperText={error.email}
+            error={error.email ? true : false}
             value={user.email}
             onChange={handleChange}
             fullWidth
@@ -107,16 +106,16 @@ const Login = () => {
             type="password"
             label="Password"
             className={classes.textField}
-            helperText={authErrors.password}
-            error={authErrors.password ? true : false}
+            helperText={error.password}
+            error={error.password ? true : false}
             value={user.password}
             onChange={handleChange}
             fullWidth
             required
           />
-          {authErrors.general && (
+          {error.general && (
             <Typography variant="body2" className={classes.customError}>
-              {authErrors.general}
+              {error.general}
             </Typography>
           )}
 
@@ -127,7 +126,7 @@ const Login = () => {
               color="primary"
               onClick={handleSubmit}
               className={classes.button}
-              disabled={authUser.loading}
+              disabled={error.loading}
             >
               Login
             </Button>
@@ -138,13 +137,13 @@ const Login = () => {
               color="primary"
               onClick={handleDialogClose}
               className={classes.button}
-              disabled={authUser.loading}
+              disabled={error.loading}
             >
               Cancel
             </Button>
           </DialogActions>
         </DialogContent>
-        {authUser.loading && (
+        {loading && (
           <CircularProgress size={30} className={classes.progress} />
         )}
       </Dialog>
@@ -152,4 +151,14 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapDispatchToProps = dispatch =>({
+  signInStart: ({email,password}) => dispatch(signInStart({email,password}))
+})
+
+const mapStateToProps = (state) => ({
+  isValid: state.user.isValid,
+  loading: state.user.loading,
+  error: state.user.error
+})
+
+export default connect (mapStateToProps, mapDispatchToProps)(Login);

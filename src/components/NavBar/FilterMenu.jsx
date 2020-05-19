@@ -1,4 +1,10 @@
-import React, { useState} from "react";
+/**
+ *
+ * Component for Filter
+ *
+ */
+
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
 import Menu from "@material-ui/core/Menu";
@@ -8,8 +14,8 @@ import { statusColors } from "../../util/filter.colors";
 import FormGroup from "@material-ui/core/FormGroup";
 import Divider from "@material-ui/core/Divider";
 
-import { usePost} from "../../contexts/post.provider";
-
+import { connect } from "react-redux";
+import { setFilter } from "../../redux/filter/fiter.actions";
 
 const useStyle = makeStyles((theme) => ({
   all: {
@@ -51,79 +57,49 @@ const useStyle = makeStyles((theme) => ({
   checked: {},
 }));
 
-const FilterMenu = () => {
-
-
+const FilterMenu = ({ filters, setFilter }) => {
   const classes = useStyle();
   const [anchorEl, setAnchorEl] = useState(null);
-  const { filter, updateFilter } = usePost();
-  
-
   const isMenuOpen = Boolean(anchorEl);
 
   const handleStatusMenuOpen = (e) => {
-    setAnchorEl(e.currentTarget);
+     setAnchorEl(e.currentTarget);
   };
 
   const handleStatusMenuClose = () => {
     setAnchorEl(null);
   };
 
-  
-
   const handleChange = (e) => {
+    const key = e.target.name;
+    const value = filters[key];
+    const countTrueNumbers = Object.values(filters).reduce(
+      (acc, item) => acc + item,
+      0
+    );
 
-      const name = e.target.name;
-    
-    
-    
-    const tempValue = filter[name];
-
-    let tempFilter = {
-      all: false,
-      created: false,
-      planned: false,
-      postponed: false,
-      cancelled: false,
-      completed: false,
-    };
+    const setAll = (flag) => ({
+      all: flag,
+      created: flag,
+      planned: flag,
+      postponed: flag,
+      cancelled: flag,
+      completed: flag,
+    });
 
     // check if all is checked
-    if (name === "all") {
-      Object.keys(tempFilter).forEach((key) => {
-        tempFilter[key] = !tempValue;
-      });
+    if (key === "all") {
+      setFilter(setAll(!value));
+    } else if (
+      countTrueNumbers === Object.values(filters).length - 2 &&
+      !value
+    ) {
+      setFilter(setAll(true));
+    } else if (countTrueNumbers === Object.values(filters).length) {
+      setFilter({ ...filters, [key]: false, all: false });
     } else {
-      tempFilter = { ...filter, [e.target.name]: e.target.checked };
+      setFilter({ ...filters, [key]: !value });
     }
-
-    if (
-      // check 'All' button when other elements checked
-      tempFilter.created &&
-      tempFilter.planned &&
-      tempFilter.completed &&
-      tempFilter.postponed &&
-      tempFilter.cancelled &&
-      !tempFilter.all
-    ) {
-      tempFilter = { ...tempFilter, all: true };
-    }
-    if (
-      // un-check 'All' button when other elements unchecked
-      !(
-        tempFilter.created &&
-        tempFilter.planned &&
-        tempFilter.completed &&
-        tempFilter.postponed &&
-        tempFilter.cancelled
-      ) &&
-      tempFilter.all
-    ) {
-      tempFilter = { ...tempFilter, all: false };
-    }    
-    updateFilter({ ...tempFilter });
-    
-    
   };
 
   // Control a side effect after state change
@@ -144,7 +120,7 @@ const FilterMenu = () => {
         anchorEl={anchorEl}
         keepMounted
         open={isMenuOpen}
-        onClose={handleStatusMenuClose}
+        onClose={handleStatusMenuClose}        
       >
         <FormGroup className={classes.formGroup}>
           <FormControlLabel
@@ -152,7 +128,7 @@ const FilterMenu = () => {
             control={
               <Checkbox
                 className={classes.all}
-                checked={filter.all}
+                checked={filters.all}
                 onChange={handleChange}
                 name="all"
               />
@@ -165,7 +141,7 @@ const FilterMenu = () => {
             control={
               <Checkbox
                 className={classes.created}
-                checked={filter.created}
+                checked={filters.created}
                 onChange={handleChange}
                 name="created"
               />
@@ -177,7 +153,7 @@ const FilterMenu = () => {
             control={
               <Checkbox
                 className={classes.planned}
-                checked={filter.planned}
+                checked={filters.planned}
                 onChange={handleChange}
                 name="planned"
               />
@@ -189,7 +165,7 @@ const FilterMenu = () => {
             control={
               <Checkbox
                 className={classes.completed}
-                checked={filter.completed}
+                checked={filters.completed}
                 onChange={handleChange}
                 name="completed"
               />
@@ -201,7 +177,7 @@ const FilterMenu = () => {
             control={
               <Checkbox
                 className={classes.postponed}
-                checked={filter.postponed}
+                checked={filters.postponed}
                 onChange={handleChange}
                 name="postponed"
               />
@@ -213,7 +189,7 @@ const FilterMenu = () => {
             control={
               <Checkbox
                 className={classes.cancelled}
-                checked={filter.cancelled}
+                checked={filters.cancelled}
                 onChange={handleChange}
                 name="cancelled"
               />
@@ -221,10 +197,17 @@ const FilterMenu = () => {
             label="Cancelled"
           />
         </FormGroup>
-    
       </Menu>
     </React.Fragment>
   );
 };
 
-export default FilterMenu;
+const mapDispatchToProps = (dispatch) => ({
+  setFilter: (filter) => dispatch(setFilter(filter)),
+});
+
+const mapStateToProps = (state) => {
+  return { filters: state.filters };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FilterMenu);
