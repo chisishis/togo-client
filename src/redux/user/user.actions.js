@@ -27,6 +27,7 @@ const signInFailure = (error) => ({
 
 const signOutStart = () => ({
   type: userActionTypes.SIGN_OUT_START,
+
 });
 
 const signOutSuccess = () => ({
@@ -38,6 +39,21 @@ const signOutFailuer = (error) => ({
   payload: error,
 });
 
+const signUpStart = (userCredential) => ({
+  type: userActionTypes.signUpStart,
+  payload: userCredential
+})
+
+const signUpSuccess = (userData) => ({
+  type: userActionTypes.signUpSuccess,
+  payload: userData
+})
+
+const signUpFailure = error => ({
+  type: userActionTypes.signUpFailure,
+  payload: error
+})
+
 
 export {
   setCurrentUser,
@@ -48,5 +64,8 @@ export {
   signOutStart,
   signOutSuccess,
   signOutFailuer,
+  signUpStart,
+  signUpSuccess,
+  signUpFailure
 
 };

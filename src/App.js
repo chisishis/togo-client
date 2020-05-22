@@ -17,12 +17,12 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <UserProvider>
+      
         <PostProvider>
           <Navbar />
           {/* <Home /> */}
         </PostProvider>
-      </UserProvider>
+   
     </ThemeProvider>
   );
 }

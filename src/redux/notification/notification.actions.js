@@ -1,8 +1,8 @@
 import userNotificationTypes from "./notification.types";
 
-const createNotifiactionStart = ({ userName, postId, status, message }) => ({
+const createNotifiactionStart = ({postUserName, postId, receipentsId, mesesage}) => ({
   action: userNotificationTypes.CREATE_NOTIFICATION_START,
-  payload: { userName, postId, status, message },
+  payload: {postUserName, postId, receipentsId, mesesage},
 });
 
 const createNotifiactionSuccess = () => ({
@@ -14,7 +14,7 @@ const createNotifiactionFailure = (error) => ({
   payload: error,
 });
 
-const fetchNotifiactionStart = ({ userName, postId, status, message }) => ({
+const fetchNotifiactionStart = (userId, ) => ({
     action: userNotificationTypes.FETCH_NOTIFICATION_START,
     payload: { userName, postId, status, message },
   });
@@ -29,16 +29,16 @@ const fetchNotifiactionStart = ({ userName, postId, status, message }) => ({
   });
 
   const removeNotifiactionStart = ({ userName, postId, status, message }) => ({
-    action: userNotificationTypes.FETCH_NOTIFICATION_START,
+    action: userNotificationTypes.REMOVE_NOTIFICATION_START,
     payload: { userName, postId, status, message },
   });
   
   const removeNotifiactionSuccess = () => ({
-    action: userNotificationTypes.FETCH_NOTIFICATION_SUCCESS,
+    action: userNotificationTypes.REMOVE_NOTIFICATION_SUCCESS,
   });
   
   const removeNotifiactionFailure = (error) => ({
-    action: userNotificationTypes.FETCH_NOTIFICATION_FAILURE,
+    action: userNotificationTypes.REMOVE_NOTIFICATION_FAILURE,
     payload: error,
   });
   
