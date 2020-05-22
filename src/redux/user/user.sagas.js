@@ -7,6 +7,8 @@ import {
   signInFailure,
   signUpFailure,
   signUpSuccess,
+  signOutSuccess,
+  signOutFailure,
   checkUserSession,
 } from "./user.actions";
 
@@ -43,9 +45,30 @@ export function* signUpWithEmailAndPassword({
     localStorage.setItem("email", user.email);
     localStorage.setItem("userId", user.uid);
 
+    yield firestore.collection("users").doc(user.uid).set({
+      displayName,
+      email: user.email,
+      userId: user.uid,
+      createdAt: user.metadata.creationTime,
+    });
+
     yield put(signUpSuccess({ email, displayName, userId: user.uid }));
   } catch (error) {
     yield put(signUpFailure(error.code));
+  }
+}
+
+export function* signOutStart() {
+  try {
+    yield auth.signOut();
+
+    localStorage.removeItem("displayName");
+    localStorage.removeItem("email");
+    localStorage.removeItem("userId");
+
+    yield put(signOutSuccess());
+  } catch (error) {
+    yield put(signOutFailure(error.code));
   }
 }
 
@@ -57,9 +80,14 @@ export function* onSignUpWithEmailAndPassword() {
   yield takeLatest(userActionTypes.SIGN_UP_START, signUpWithEmailAndPassword);
 }
 
+export function* onSignOutStart() {
+  yield takeLatest(userActionTypes.SIGN_OUT_START, signOutStart);
+}
+
 export function* userSagas() {
   yield all([
     call(onSignInWithEmailPassword),
     call(onSignUpWithEmailAndPassword),
+    call(onSignOutStart),
   ]);
 }

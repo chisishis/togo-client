@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
-import { makeStyles, Tabs } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 
 import Box from "@material-ui/core/Box";
@@ -11,9 +11,8 @@ import Box from "@material-ui/core/Box";
 import DialogActions from "@material-ui/core/DialogActions";
 
 import { connect } from "react-redux";
-import { signInStart } from "../../redux/user/user.actions";
+import { signUpStart } from "../../redux/user/user.actions";
 import { errorParser } from "../../util/firebase/error-handler";
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -29,14 +28,13 @@ marginTop: 20
   },
 }));
 
-const Login = ({
+const Signup = ({
   loading,
   error,
-  signInStart,
+  signUpStart,
   closeHandler,
   value,
   index,
-  
   ...props
 }) => {
   const classes = useStyles();
@@ -44,13 +42,15 @@ const Login = ({
   const [user, setUser] = useState({
     email: "",
     password: "",
+    displayName: ""
   });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    await signInStart(user);
-    closeHandler();
+    e.preventDefault();    
+    await signUpStart(user);
+    //await closeHandler();
   };
+
 
   const handleChange = (e) => {
     const { value, name } = e.target;
@@ -64,9 +64,21 @@ const Login = ({
       className={classes.form}
       component="form"
       onSubmit={handleSubmit}
-      id="login-form"
+      id="signup-form"
       {...props}
     >
+        <TextField
+        name="displayName"
+        type="text"
+        label="User Name"
+        className={classes.textField}
+        value={user.displayName}
+        onChange={handleChange}
+        fullWidth
+        autoFocus
+        margin="dense"
+        required
+      />
       <TextField
         name="email"
         type="email"
@@ -109,7 +121,7 @@ const Login = ({
           className={classes.button}
           disabled={loading}
         >
-          Login
+          Signup
         </Button>
 
         <Button
@@ -124,14 +136,14 @@ const Login = ({
         </Button>
       </DialogActions>
 
-  
+      
     </Box>
   );
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  signInStart: ({ email, password }) =>
-    dispatch(signInStart({ email, password })),
+  signUpStart: ({ email, password, displayName }) =>
+    dispatch(signUpStart({ email, password, displayName })),
 });
 
 const mapStateToProps = (state, ownProps) => ({
@@ -143,4 +155,4 @@ const mapStateToProps = (state, ownProps) => ({
   props: ownProps.props,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);

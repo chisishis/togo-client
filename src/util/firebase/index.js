@@ -15,15 +15,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-export const errorParser = errorCode => {
-    switch (errorCode) {
-        case 'auth/invalid-email': return 'Invalid Email'
-        case 'auth/user-disabled': return 'Disabled User'
-        case 'auth/user-not-found': return 'User Not Found'
-        case 'auth/wrong-password': return 'Wrong Password'
-        default: return 'Unknown Error'
-    }
-}
+
 
 
 export const auth = firebase.auth();

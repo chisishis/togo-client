@@ -18,10 +18,10 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       
-        <PostProvider>
+        {/* <PostProvider> */}
           <Navbar />
           {/* <Home /> */}
-        </PostProvider>
+        {/* </PostProvider> */}
    
     </ThemeProvider>
   );

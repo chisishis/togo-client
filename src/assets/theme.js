@@ -1,11 +1,14 @@
 //  Customized theme for MUI
+import blue from '@material-ui/core/colors/blue';
+import red from '@material-ui/core/colors/red';
+
 
 const theme = {
   palette: {
     primary: {
-      light: "#534bae",
-      main: "#1a237e",
-      dark: "#000051",
+      light: blue[400],
+      main: blue[600],
+      dark: blue[900],
     },
     secondary: {
       light: "#ff5c8d",

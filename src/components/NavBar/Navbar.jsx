@@ -1,28 +1,31 @@
 import React, { useState } from "react";
 
-import { makeStyles, Dialog } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import Popover from "@material-ui/core/Popover";
-
 import Container from "@material-ui/core/Container";
-import Menu from "@material-ui/core/Menu";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Dialog from "@material-ui/core/Dialog";
+import Button from "@material-ui/core/Button";
+
+import { useTheme } from "@material-ui/core/styles";
 
 import FilterListIcon from "@material-ui/icons/FilterList";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AddIcon from "@material-ui/icons/Add";
 import PersonIcon from "@material-ui/icons/Person";
 
-import Login from "./Login";
+import SignInSignUp from "./SignInSignUp";
 import Filter from "./Filter";
 import Greetings from "./Greetings";
 import NewPost from "./NewPost";
 import Notification from "./Notification";
 import User from "./User";
+import { LoadingProgress } from "../common/LoadingProgress";
 
 import { connect } from "react-redux";
-import { signOutStart } from "../../redux/user/user.actions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     margin: theme.spacing(0),
+    color:'#777'
   },
 }));
 
@@ -44,8 +48,10 @@ const useStyles = makeStyles((theme) => ({
  * @param {tokenss} token ds
  * @param token sss
  */
-const Navbar = ({ userData }) => {
+const Navbar = ({ userData, loading }) => {
   const classes = useStyles();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
 
   const [anchor, setAnchor] = useState(null);
 
@@ -91,12 +97,16 @@ const Navbar = ({ userData }) => {
             children={<NotificationsIcon />}
           />
 
-          <IconButton
+          <Button
             id="user-button"
+            size='large'
+            color='inherit'
             className={classes.button}
             onClick={handleMenuOpen}
-            children={<PersonIcon />}
-          />
+            startIcon={<PersonIcon />}
+          >
+            {Boolean(userData)? userData.displayName: 'Login'}
+          </Button>
 
           <Popover
             elevation={3}
@@ -138,17 +148,22 @@ const Navbar = ({ userData }) => {
               open={isMenuOpen("user")}
               onClose={handleMenuClose}
             >
-              <User />
+              <User closeHandler={handleMenuClose}/>
+           
             </Popover>
           ) : (
             <Dialog
               open={isMenuOpen("user")}
               onClose={handleMenuClose}
-              fullWidth
+              fullWidth={matches}
+              fullScreen={!matches}
+              className={classes.dialog}
             >
-              <Login closeHandler={handleMenuClose}/>
+              <SignInSignUp closeHandler={handleMenuClose} />
+          
             </Dialog>
           )}
+              {loading && <LoadingProgress />}
         </Toolbar>
       </Container>
     </AppBar>
@@ -157,6 +172,7 @@ const Navbar = ({ userData }) => {
 
 const mapStateToProps = (state) => ({
   userData: state.user.userData,
+  loading: state.user.loading
 });
 
 export default connect(mapStateToProps, null)(Navbar);
