@@ -7,7 +7,7 @@ const setCurrentUser = (user) => ({
 
 const checkUserSession = (token) => ({
   type: userActionTypes.CHECK_USER_SESSION,
-  payload: token
+ 
 });
 
 const signInStart = (emailAndPassword) => ({

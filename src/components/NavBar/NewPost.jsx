@@ -14,16 +14,18 @@ import InputBase from "@material-ui/core/InputBase";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
+import Box from "@material-ui/core/Box";
+
 
 import { isUrl, isTag } from "../../util/validUrl";
 
 import CancelButton from "./CancelButton";
 
-
-
 import {shortenUrl} from "../../util/utils"
 
-import { usePost } from '../../contexts/post.provider'
+
+import { connect } from "react-redux";
+import { newPostStart } from "../../redux/post/post.actions";
 
 import Axios from "axios";
 
@@ -69,13 +71,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const NewPost = ({token, userName}) => {
+const NewPost = ( {displayName, email, newPostStart, closeHandler }) => {
   const classes = useStyles();
-
-  const { postNew }= usePost();
   
-  const [isDialogOpen, setDialogOpen] = useState(false);
-
   const [newPost, setNewPost] = useState({
     status: "created",
     memo: "",
@@ -97,9 +95,6 @@ const NewPost = ({token, userName}) => {
     isValid: false,
   });
 
-  const toggleDialog = () => {
-    setDialogOpen(!isDialogOpen);
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -108,8 +103,7 @@ const NewPost = ({token, userName}) => {
     const hashTag = postArray.filter( word => isTag(word)&& word.slice(1));
     const memo = postArray.filter(( word ) => !isTag(word) && !isUrl(word) && word).join(' ');
 
-    postNew({ ...newPost, ...link, memo: memo, tag: hashTag }, token);
-    setDialogOpen(!isDialogOpen);
+    // postNew({ ...newPost, ...link, memo: memo, tag: hashTag }, token);  
   };
 
   const handleChange = (e) => {
@@ -155,7 +149,7 @@ const NewPost = ({token, userName}) => {
         <Typography variant="h5" component="span">
           CreatePost
         </Typography>
-        <CancelButton clickHandler={toggleDialog} />
+        <CancelButton clickHandler={closeHandler} />
       </DialogTitle>
     );
   };
@@ -178,27 +172,12 @@ const NewPost = ({token, userName}) => {
   };
 
   return (
-    <React.Fragment>
-      <Button color="inherit" onClick={toggleDialog}>
-        NEW
-      </Button>
-      <Dialog
-        open={isDialogOpen}
-        fullWidth
-        maxWidth="sm"
-        onClose={toggleDialog}
-        aria-labelledby="login-dialog-title"
-        scroll="paper"
-        BackdropProps={{
-          classes: {
-            root: classes.backDrop,
-          },
-        }}
-      >
+    <Box component='form' onSubmit={handleSubmit}>
+ 
         <NewPostTitle />
         <Divider />
         <DialogContent>
-          <Typography variant="h6">{userName}</Typography>
+          <Typography variant="h6">{displayName}</Typography>
 
           <InputBase
             id="description"
@@ -257,9 +236,22 @@ const NewPost = ({token, userName}) => {
         )}
 
         <NewPostActions />
-      </Dialog>
-    </React.Fragment>
+    
+    </Box>
   );
 };
 
-export default NewPost;
+const mapStateToProps = (state, ownProps) => ({
+  email: state.user.userData.email,
+  displayName: state.user.userData.displayName,
+  closeHandler: ownProps.closeHandler
+
+});
+
+
+const mapDispatchToProps = (dispatch) => ({
+  newPostStart: (post) =>
+    dispatch(newPostStart(post)),
+});
+
+export default connect(mapStateToProps, null)(NewPost);

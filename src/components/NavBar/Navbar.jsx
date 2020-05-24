@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     margin: theme.spacing(0),
-    color:'#777'
+    color: "#777",
   },
 }));
 
@@ -99,14 +99,25 @@ const Navbar = ({ userData, loading }) => {
 
           <Button
             id="user-button"
-            size='large'
-            color='inherit'
+            size="large"
+            color="inherit"
             className={classes.button}
             onClick={handleMenuOpen}
             startIcon={<PersonIcon />}
           >
-            {Boolean(userData)? userData.displayName: 'Login'}
+            {Boolean(userData) ? userData.displayName : "Login"}
           </Button>
+
+          <Dialog
+            elevation={3}
+            open={isMenuOpen("new")}
+            fullWidth={matches}
+            fullScreen={!matches}
+            onClose={handleMenuClose}
+            scroll="paper"
+          >
+            <NewPost closeHandler={handleMenuClose} />
+          </Dialog>
 
           <Popover
             elevation={3}
@@ -148,8 +159,7 @@ const Navbar = ({ userData, loading }) => {
               open={isMenuOpen("user")}
               onClose={handleMenuClose}
             >
-              <User closeHandler={handleMenuClose}/>
-           
+              <User closeHandler={handleMenuClose} />
             </Popover>
           ) : (
             <Dialog
@@ -160,10 +170,9 @@ const Navbar = ({ userData, loading }) => {
               className={classes.dialog}
             >
               <SignInSignUp closeHandler={handleMenuClose} />
-          
             </Dialog>
           )}
-              {loading && <LoadingProgress />}
+          {loading && <LoadingProgress />}
         </Toolbar>
       </Container>
     </AppBar>
@@ -172,7 +181,7 @@ const Navbar = ({ userData, loading }) => {
 
 const mapStateToProps = (state) => ({
   userData: state.user.userData,
-  loading: state.user.loading
+  loading: state.user.loading,
 });
 
 export default connect(mapStateToProps, null)(Navbar);

@@ -14,11 +14,9 @@ import { connect } from "react-redux";
 import { signInStart } from "../../redux/user/user.actions";
 import { errorParser } from "../../util/firebase/error-handler";
 
-
-
 const useStyles = makeStyles((theme) => ({
   form: {
-marginTop: 20
+    marginTop: 20,
   },
   textField: {
     margin: "10px auto 10px auto",
@@ -36,7 +34,7 @@ const Login = ({
   closeHandler,
   value,
   index,
-  
+  userData,
   ...props
 }) => {
   const classes = useStyles();
@@ -49,7 +47,7 @@ const Login = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     await signInStart(user);
-    closeHandler();
+    Boolean(userData) && closeHandler();
   };
 
   const handleChange = (e) => {
@@ -123,8 +121,6 @@ const Login = ({
           Cancel
         </Button>
       </DialogActions>
-
-  
     </Box>
   );
 };
@@ -141,6 +137,7 @@ const mapStateToProps = (state, ownProps) => ({
   value: ownProps.value,
   index: ownProps.index,
   props: ownProps.props,
+  userData: state.user.userData,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

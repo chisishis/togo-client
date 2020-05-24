@@ -12,7 +12,7 @@ import {
   checkUserSession,
 } from "./user.actions";
 
-import { auth, firestore } from "../../util/firebase";
+import { auth, firestore, getCurrentUser } from "../../util/firebase";
 
 export function* signInWithEmailAndPassword({ payload: { email, password } }) {
   try {
@@ -24,9 +24,7 @@ export function* signInWithEmailAndPassword({ payload: { email, password } }) {
       displayName: user.displayName,
     };
 
-    localStorage.setItem("displayName", userData.displayName);
-    localStorage.setItem("email", userData.email);
-    localStorage.setItem("userId", userData.userId);
+ 
 
     yield put(signInSuccess(userData));
   } catch (error) {
@@ -41,10 +39,7 @@ export function* signUpWithEmailAndPassword({
     const { user } = yield auth.createUserWithEmailAndPassword(email, password);
     yield user.updateProfile({ displayName });
 
-    localStorage.setItem("displayName", displayName);
-    localStorage.setItem("email", user.email);
-    localStorage.setItem("userId", user.uid);
-
+ 
     yield firestore.collection("users").doc(user.uid).set({
       displayName,
       email: user.email,
@@ -62,13 +57,22 @@ export function* signOutStart() {
   try {
     yield auth.signOut();
 
-    localStorage.removeItem("displayName");
-    localStorage.removeItem("email");
-    localStorage.removeItem("userId");
+
 
     yield put(signOutSuccess());
   } catch (error) {
     yield put(signOutFailure(error.code));
+  }
+}
+
+export function* isUserAuthenticated(){
+  try {
+      const userAuth = yield getCurrentUser();
+      if (!userAuth) return;
+      yield put(signInSuccess({email: userAuth.email, displayName:userAuth.displayName, userId: userAuth.uid}));
+      
+  } catch (error) {
+      yield put(signInFailure(error))
   }
 }
 
@@ -84,10 +88,15 @@ export function* onSignOutStart() {
   yield takeLatest(userActionTypes.SIGN_OUT_START, signOutStart);
 }
 
+export function* onCheckUserSession() {
+  yield takeLatest(userActionTypes.CHECK_USER_SESSION,isUserAuthenticated)
+}
+
 export function* userSagas() {
   yield all([
     call(onSignInWithEmailPassword),
     call(onSignUpWithEmailAndPassword),
     call(onSignOutStart),
+    call(onCheckUserSession)
   ]);
 }

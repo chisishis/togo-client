@@ -29,7 +29,7 @@ const User = ({ user, signOutStart, loading, closeHandler }) => {
 
   const lastLoggedIn = new Date().getDate();
 
-  const { displayName, email } = user;
+  const { displayName='', email='' } = user;
 
   const countPosts = {
     created: 0,
@@ -39,14 +39,13 @@ const User = ({ user, signOutStart, loading, closeHandler }) => {
     completed: 0,
   };
 
-  const handleClick = async (e) => {
-    e.preventDefault();
-    await signOutStart(user);
-    closeHandler();
+  const handleClick = async (e) => {    
+    await signOutStart();
+    
   };
 
   return (
-    <Box className={classes.root}>
+    <Box component='form' onSubmit={handleClick} className={classes.root}>
       <Typography variant="body1" align="center">
         {`Hi ${displayName}`}
       </Typography>
@@ -68,7 +67,7 @@ const User = ({ user, signOutStart, loading, closeHandler }) => {
         variant="contained"
         color="primary"
         fullWidth
-        onClick={handleClick}
+        type='submit'
       >
         {"Sign Out"}
       </Button>
