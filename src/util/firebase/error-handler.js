@@ -11,6 +11,6 @@ export const errorParser = (errorCode = 'general/blank') => {
         case 'auth/too-many-requests': return 'Too manu requests. Try it again later'
         case 'auth/unauthorized-domain': return 'Unauthorized access'
         case 'auth/user-token-expired': return 'You token has exprired. Please sign-in again'
-        default: return 'Unknown Error'
+        default: return ``
     }
 }

@@ -43,14 +43,12 @@ const useStyle = makeStyles((theme) => ({
     },
   },
   formGroup: {
-    padding: theme.spacing(1)
-    
+    padding: theme.spacing(1),
   },
   checked: {},
   label: {
-    marginLeft: 0
-  }
-
+    marginLeft: 0,
+  },
 }));
 
 /**
@@ -62,16 +60,6 @@ const useStyle = makeStyles((theme) => ({
 
 const Filter = ({ filters, setFilter }) => {
   const classes = useStyle();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const isMenuOpen = Boolean(anchorEl);
-
-  const handleStatusMenuOpen = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handleStatusMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleChange = (e) => {
     const key = e.target.name;
@@ -105,8 +93,6 @@ const Filter = ({ filters, setFilter }) => {
     }
   };
 
-
-
   const StatusLabel = ({ status }) => (
     <FormControlLabel
       className={classes.label}
@@ -125,13 +111,13 @@ const Filter = ({ filters, setFilter }) => {
 
   return (
     <FormGroup className={classes.formGroup}>
-      <StatusLabel status="all"/>
+      <StatusLabel status="all" />
       <Divider />
-      <StatusLabel status="created"/>
-      <StatusLabel status="planned"/>
-      <StatusLabel status="completed"/>
-      <StatusLabel status="postponed"/>
-      <StatusLabel status="cancelled"/>
+      <StatusLabel status="created" />
+      <StatusLabel status="planned" />
+      <StatusLabel status="completed" />
+      <StatusLabel status="postponed" />
+      <StatusLabel status="cancelled" />
     </FormGroup>
   );
 };

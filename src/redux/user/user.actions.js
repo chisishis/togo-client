@@ -2,7 +2,7 @@ import userActionTypes from "./user.types";
 
 const setCurrentUser = (user) => ({
   type: userActionTypes.SET_CURRENT_USER,
-  payload: user,
+  payload: user
 });
 
 const checkUserSession = (token) => ({
@@ -10,9 +10,9 @@ const checkUserSession = (token) => ({
  
 });
 
-const signInStart = (emailAndPassword) => ({
+const signInStart = (userCredential) => ({
   type: userActionTypes.SIGN_IN_START,
-  payload: emailAndPassword,
+  payload: userCredential,
 });
 
 const signInSuccess = (userData) => ({

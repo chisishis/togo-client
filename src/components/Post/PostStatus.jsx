@@ -1,10 +1,12 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core";
+import PropTypes from "prop-types";
 
 import Button from "@material-ui/core/Button";
+import { makeStyles } from "@material-ui/core";
+
+import dayjs from "dayjs";
 
 import {statusColors} from '../../assets/statusColors'
-
 
 const useStyles = makeStyles((theme) => ({
   button: (props) => ({
@@ -24,8 +26,13 @@ const useStyles = makeStyles((theme) => ({
   }),
 }));
 
-const Status = ({ status, date}) => {
-  const statusColor = statusColors[status];  
+const PostStatus = ({ status }) => {
+
+  const statusObject = status[0]
+  const {type, date} = statusObject
+
+  const statusDate = dayjs(date).format("MMM DD, YYYY");
+  const statusColor = statusColors[type];  
 
   const classes = useStyles({ statusColor });
  
@@ -39,10 +46,15 @@ const Status = ({ status, date}) => {
       align="right"
       className={classes.button}
     >
-      {status} : {date}
+      {type} : {statusDate}
     </Button>
     
   );
 };
 
-export default Status;
+PostStatus.protoType = {
+  status: PropTypes.object.isRequired,
+};
+
+
+export default PostStatus;

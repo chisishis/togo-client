@@ -29,9 +29,39 @@ const getCurrentUser = () => {
   })
 }
 
+const startNewPost =  async (post, shareWith, tags, statusDates, link) => {
+  try {
+    
+    await firestore.collection('posts').doc().set({post, shareWith, tags, statusDates, link})
+    
+    return ('Success');
+  }
+  catch (error) {
+    return (`Error: ${error.code}`)
+  }
+}
+
+const fetchAllPosts = async (filter) => {
+  try {
+    const collectionRef = firestore.collection('posts');
+    const snapShop = await collectionRef.get();
+    const allPosts = snapShop.docs.map (doc => doc.data());
+
+    console.log(allPosts)
+  } catch (error) {
+    console.log(error.code);
+  }
+}
+
+
+
 export {
   auth,
   firestore,
-  getCurrentUser}
+  startNewPost,
+  getCurrentUser,
+  fetchAllPosts
+
+}
 
 

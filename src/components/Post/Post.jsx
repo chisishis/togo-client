@@ -5,8 +5,8 @@ import Card from "@material-ui/core/Card";
 //MUI Components
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import CardHeader from "@material-ui/core/CardHeader";
-import Avatar from "@material-ui/core/Avatar";
+
+
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
@@ -30,27 +30,25 @@ import PeopleIcon from '@material-ui/icons/People';
 
 
 // Utils
-import { convertDate } from "../../util/utils";
+import { convertDate } from "../../util";
 import dayjs from "dayjs";
 
 // Context Consumers
-import { usePost } from "../../contexts/post.provider";
-import { useAuth } from "../../contexts/user.provider";
+
+
 
 // Custom Components
 import Tag from "./Tag";
-import Status from "./Status";
-import ConfirmButton from "../elements/ConfirmButton";
+import Status from "./PostStatus";
+import ConfirmButton from "../common/ConfirmButton";
 import PostActionArea from "./PostActionArea";
+import PostAvatar from './PostAvatar'
 
 const useStyles = makeStyles((theme) => ({
   root: {
     margin: theme.spacing(2),
     maxWidth: "100%",
     borderRadius: 8,
-  },
-  avatar: {
-    fontSize: '1.6rem'
   },
 
   memo: {
@@ -75,25 +73,11 @@ const useStyles = makeStyles((theme) => ({
 
 const Post = ({ post }) => {
   // Destruct Post item
-  const {
-    postId,
-    title,
-    description,
-    ownerName,
-    linkUrl,
-    imageUrl,
-    tag,
-    memo,
-    history,
-    shareWith
-  } = post;
-
+ 
   const classes = useStyles();
+  return (<div/>)
+}
 
-  // destuct date from context
-  const userToken = useAuth().user.token;
-  const loggedInUser = useAuth().user.userName;
-  const { deletePost, updateTag, updateMemo } = usePost();
 
   // local states
   const [anchorEl, setAnchorEl] = useState(null); // Side Menu Elements
@@ -172,72 +156,19 @@ const Post = ({ post }) => {
 
   
 
-  const CardAvatar = (
-    <Avatar aria-label="recipe" className={classes.avatar}>
-      {String(ownerName).toUpperCase()[0]}
-    </Avatar>
-  );
 
-  const CardActionButton = ownerName === loggedInUser && (
-    <IconButton
-      aria-label="settings"
-      name="delete-post"
-      onClick={handleMoreMenu}
-    >
-      <MoreVertIcon />
-    </IconButton>
-  );
 
-  // Functions for General
-  const ShareWith = () => {
-    
   
-    switch (shareWith[0]) {
-      case 'Public' : {
-        return (
-          <IconButton size='small'>
-          <PublicIcon/>
-        </IconButton>
-          )
-          
-        
-      }
-      case 'OnlyMe' : {
-        return(
-        <IconButton size='small'>
-          <LockIcon/>
-        </IconButton>)
-      }
-      case 'Friends' : {
-       return ( <IconButton size='small'>
-          <PeopleIcon/>
-        </IconButton>)
-      }
-      default:
-
-    }
-
-  }
-    
-  const subHeader =     
-      <div>
-        {dayjs(history[0].date).format("MMM DD, YYYY")}&nbsp;
-        <ShareWith/>
-      </div>
-      
-    
+  // Functions for General
+  
  
 
   
   
   return (
     <Card id={postId} className={classes.root}>
-      <CardHeader
-        avatar={CardAvatar}
-        action={CardActionButton}
-        title={ownerName}
-        subheader={subHeader}
-      />
+      
+      <PostHeader postId={post.id} createdDate={statusDates[0].date} />
 
       <Menu
         id="post-menu"
@@ -356,38 +287,8 @@ const Post = ({ post }) => {
         />
       </Dialog>
 
-      <CardContent>
-        <Typography variant="body2" component="p" className={classes.memo}>
-          {memo}
-        </Typography>
-        <Typography align="right">
-          <Status
-            status={history[history.length - 1].name}
-            date={dayjs(history[history.length - 1].date) .format("MMM DD, YYYY")}
-          />
-        </Typography>
-      </CardContent>
-      <Divider />
-      <PostActionArea
-        image={imageUrl}
-        link={linkUrl}
-        description={description}
-        title={title}
-      />
-
-      <CardContent>
-        <Typography
-          xs={12}
-          align="right"
-          variant="body2"
-          color="textSecondary"
-          className={classes.tags}
-        >
-          {tag.map((element) => (
-            <Tag key={element} tagItem={element} />
-          ))}
-        </Typography>
-      </CardContent>
+ 
+     
     </Card>
   );
 };

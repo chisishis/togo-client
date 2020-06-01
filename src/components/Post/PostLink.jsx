@@ -6,8 +6,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core";
-
-import { shortenUrl } from "../../util/utils";
+import { shortenUrl } from "../../util";
 
 const useStyle = makeStyles({
   url: {
@@ -18,21 +17,24 @@ const useStyle = makeStyles({
   },
 });
 
-const PostActionArea = ({ image, title, link, description }) => {
+const PostLink = ({ link }) => {
+  const { description, imageUrl, isValid, title, url } = link;
   const classes = useStyle();
   const openWindow = () => {
-    window.open(link, "_blank");
+    window.open(url, "_blank");
   };
+
+  const shortenedUrl = String(shortenUrl(url)).toUpperCase();
 
   return (
     <CardActionArea onClick={openWindow}>
-      {image !== "" && (
+      {imageUrl !== "" && (
         <CardMedia
           className={classes.media}
           component="img"
           height="240"
           alt="spot image"
-          image={image}
+          image={imageUrl}
           title={title}
         />
       )}
@@ -42,32 +44,30 @@ const PostActionArea = ({ image, title, link, description }) => {
           gutterBottom
           variant="body2"
           component="p"
-        >
-          {String(shortenUrl(link)).toUpperCase()}
-        </Typography>
+          children={shortenedUrl}
+        />
 
         <Typography
           className={classes.title}
           gutterBottom
           variant="h5"
           component="h2"
-        >
-          {title}
-        </Typography>
+          children={title}
+        />
 
-        <Typography variant="body2" color="textSecondary" component="p">
-          {description}
-        </Typography>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          component="p"
+          children={description}
+        />
       </CardContent>
     </CardActionArea>
   );
 };
 
-PostActionArea.protoType = {
-  image: PropTypes.string.isRequired,
-  link: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+PostLink.protoType = {
+  link: PropTypes.object.isRequired,
 };
 
-export default PostActionArea;
+export default PostLink;

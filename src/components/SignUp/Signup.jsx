@@ -2,17 +2,14 @@ import React, { useState } from "react";
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-
-import { makeStyles, Tabs } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-
 import Box from "@material-ui/core/Box";
-
-import DialogActions from "@material-ui/core/DialogActions";
+import { makeStyles } from "@material-ui/core";
 
 import { connect } from "react-redux";
-import { signInStart } from "../../redux/user/user.actions";
+import { signUpStart } from "../../redux/user/user.actions";
+
 import { errorParser } from "../../util/firebase/error-handler";
+import SubmitButton from "../common/SubmitButton";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -21,33 +18,28 @@ const useStyles = makeStyles((theme) => ({
   textField: {
     margin: "10px auto 10px auto",
   },
-
-  progress: {
-    position: "relative",
-  },
 }));
 
-const Login = ({
+const Signup = ({
   loading,
   error,
-  signInStart,
+  signUpStart,
   closeHandler,
   value,
   index,
-  userData,
-  ...props
+
 }) => {
   const classes = useStyles();
 
   const [user, setUser] = useState({
     email: "",
     password: "",
+    displayName: "",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signInStart(user);
-    Boolean(userData) && closeHandler();
+    await signUpStart(user);
   };
 
   const handleChange = (e) => {
@@ -58,13 +50,24 @@ const Login = ({
   return (
     <Box
       role="tabpanel"
-      hidden={value != index}
+      hidden={value !== index}
       className={classes.form}
       component="form"
       onSubmit={handleSubmit}
-      id="login-form"
-      {...props}
+      id="signup-form"
+ 
     >
+      <TextField
+        name="displayName"
+        type="text"
+        label="User Name"
+        className={classes.textField}
+        value={user.displayName}
+        onChange={handleChange}
+        fullWidth
+        autoFocus
+        required
+      />
       <TextField
         name="email"
         type="email"
@@ -74,7 +77,6 @@ const Login = ({
         onChange={handleChange}
         fullWidth
         autoFocus
-        margin="dense"
         required
       />
       <TextField
@@ -87,47 +89,24 @@ const Login = ({
         fullWidth
         required
       />
-      {Boolean(error) && (
-        <Typography
-          align="center"
-          color="error"
-          gutterBottom={"true"}
-          variant="body2"
-          className={classes.customError}
-        >
-          {errorParser(error)}
-        </Typography>
-      )}
 
-      <DialogActions>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          disabled={loading}
-        >
-          Login
-        </Button>
+      <Typography
+        align="center"
+        color="error"
+        gutterBottom={true}
+        variant="body2"
+      >
+        {errorParser(error)}
+      </Typography>
 
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          disabled={loading}
-          onClick={closeHandler}
-        >
-          Cancel
-        </Button>
-      </DialogActions>
+      <SubmitButton text="Sign Up" fullWidth margin={3} />
     </Box>
   );
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  signInStart: ({ email, password }) =>
-    dispatch(signInStart({ email, password })),
+  signUpStart: ({ email, password, displayName }) =>
+    dispatch(signUpStart({ email, password, displayName })),
 });
 
 const mapStateToProps = (state, ownProps) => ({
@@ -137,7 +116,6 @@ const mapStateToProps = (state, ownProps) => ({
   value: ownProps.value,
   index: ownProps.index,
   props: ownProps.props,
-  userData: state.user.userData,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);

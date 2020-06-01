@@ -2,54 +2,38 @@ import React, { useState } from "react";
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-
-import { makeStyles } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-
 import Box from "@material-ui/core/Box";
 
-import DialogActions from "@material-ui/core/DialogActions";
+import { makeStyles } from "@material-ui/core";
 
 import { connect } from "react-redux";
-import { signUpStart } from "../../redux/user/user.actions";
+import { signInStart } from "../../redux/user/user.actions";
 import { errorParser } from "../../util/firebase/error-handler";
 
 
+import SubmitButton from "../common/SubmitButton";
+
 const useStyles = makeStyles((theme) => ({
   form: {
-marginTop: 20
-  },
+   marginTop: 20,
+   },
   textField: {
     margin: "10px auto 10px auto",
   },
-
-  progress: {
-    position: "relative",
-  },
 }));
 
-const Signup = ({
-  loading,
-  error,
-  signUpStart,
-  closeHandler,
-  value,
-  index,
-  ...props
-}) => {
+const Signin = ({ error, signInStart, closeHandler, value, index }) => {
   const classes = useStyles();
 
   const [user, setUser] = useState({
     email: "",
     password: "",
-    displayName: ""
   });
 
   const handleSubmit = async (e) => {
-
-    await signUpStart(user);
+    e.preventDefault();
+    await signInStart(user);
   };
-
 
   const handleChange = (e) => {
     const { value, name } = e.target;
@@ -59,25 +43,13 @@ const Signup = ({
   return (
     <Box
       role="tabpanel"
-      hidden={value != index}
+      hidden={value !== index}
       className={classes.form}
       component="form"
       onSubmit={handleSubmit}
-      id="signup-form"
-      {...props}
+      id="login-form"
+      
     >
-        <TextField
-        name="displayName"
-        type="text"
-        label="User Name"
-        className={classes.textField}
-        value={user.displayName}
-        onChange={handleChange}
-        fullWidth
-        autoFocus
-        margin="dense"
-        required
-      />
       <TextField
         name="email"
         type="email"
@@ -100,58 +72,31 @@ const Signup = ({
         fullWidth
         required
       />
-      {Boolean(error) && (
+     
         <Typography
           align="center"
           color="error"
-          gutterBottom={"true"}
+          gutterBottom={true}
           variant="body2"
-          className={classes.customError}
         >
           {errorParser(error)}
         </Typography>
-      )}
-
-      <DialogActions>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          disabled={loading}
-        >
-          Signup
-        </Button>
-
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          disabled={loading}
-          onClick={closeHandler}
-        >
-          Cancel
-        </Button>
-      </DialogActions>
-
+      
+        <SubmitButton text="Sign In" fullWidth margin={3} />
       
     </Box>
   );
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  signUpStart: ({ email, password, displayName }) =>
-    dispatch(signUpStart({ email, password, displayName })),
+  signInStart: (userCredential) => dispatch(signInStart(userCredential)),
 });
 
 const mapStateToProps = (state, ownProps) => ({
-  loading: state.user.loading,
   error: state.user.error,
   closeHandler: ownProps.closeHandler,
   value: ownProps.value,
   index: ownProps.index,
-  props: ownProps.props,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Signup);
+export default connect(mapStateToProps, mapDispatchToProps)(Signin);

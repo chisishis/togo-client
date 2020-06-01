@@ -1,16 +1,14 @@
 import React from "react";
-import PropTypes from "prop-types";
 
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
-import Button from "@material-ui/core/Button";
+
 import { makeStyles } from "@material-ui/core";
 
 import { connect } from "react-redux";
 import { signOutStart } from "../../redux/user/user.actions";
-
-import { LoadingProgress } from "../common/LoadingProgress";
+import SubmitButton from "../common/SubmitButton";
 
 const useStyle = makeStyles((theme) => ({
   root: {
@@ -24,12 +22,12 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-const User = ({ user, signOutStart, loading, closeHandler }) => {
+const Account = ({ user, signOutStart }) => {
   const classes = useStyle();
 
   const lastLoggedIn = new Date().getDate();
 
-  const { displayName='', email='' } = user;
+  const { displayName = "", email = "" } = user;
 
   const countPosts = {
     created: 0,
@@ -39,13 +37,13 @@ const User = ({ user, signOutStart, loading, closeHandler }) => {
     completed: 0,
   };
 
-  const handleClick = async (e) => {    
-    await signOutStart();
+  const handleClick = async (e) => {
     
+    await signOutStart();
   };
 
   return (
-    <Box component='form' onSubmit={handleClick} className={classes.root}>
+    <Box component="form" onSubmit={handleClick} className={classes.root}>
       <Typography variant="body1" align="center">
         {`Hi ${displayName}`}
       </Typography>
@@ -63,26 +61,16 @@ const User = ({ user, signOutStart, loading, closeHandler }) => {
         align="left"
       >{`Post you were tagged:`}</Typography>
       <Divider className={classes.divider} />
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        type='submit'
-      >
-        {"Sign Out"}
-      </Button>
-      {loading && <LoadingProgress />}
+      <SubmitButton text='Sign Out' fullWidth margin={0}/>
+      
     </Box>
   );
 };
 
-User.propTypes = {};
-
 const mapStateToProps = (state, ownProps) => {
   return {
     user: state.user.userData,
-    closeHandler: ownProps.closeHandler,
-    loading: state.user.loading
+    loading: state.user.loading,
   };
 };
 
@@ -90,4 +78,4 @@ const mapDispatchToProps = (dispatch) => ({
   signOutStart: () => dispatch(signOutStart()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(User);
+export default connect(mapStateToProps, mapDispatchToProps)(Account);

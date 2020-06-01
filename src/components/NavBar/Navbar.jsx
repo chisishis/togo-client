@@ -1,29 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 import { makeStyles } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
 import Popover from "@material-ui/core/Popover";
 import Container from "@material-ui/core/Container";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import Dialog from "@material-ui/core/Dialog";
 import Button from "@material-ui/core/Button";
-
-import { useTheme } from "@material-ui/core/styles";
 
 import FilterListIcon from "@material-ui/icons/FilterList";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import AddIcon from "@material-ui/icons/Add";
 import PersonIcon from "@material-ui/icons/Person";
 
-import SignInSignUp from "./SignInSignUp";
-import Filter from "./Filter";
-import Greetings from "./Greetings";
-import NewPost from "./NewPost";
-import Notification from "./Notification";
-import User from "./User";
-import { LoadingProgress } from "../common/LoadingProgress";
+import Filter from "../Menu/Filter";
+
+import Notification from "../Menu/Notification";
+import Account from "../Account/Account";
 
 import { connect } from "react-redux";
 
@@ -37,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "flex-end",
   },
   button: {
-    margin: theme.spacing(0),
+    margin: theme.spacing(1),
     color: "#777",
   },
 }));
@@ -48,131 +39,79 @@ const useStyles = makeStyles((theme) => ({
  * @param {tokenss} token ds
  * @param token sss
  */
-const Navbar = ({ userData, loading }) => {
+const Navbar = ({ userData }) => {
   const classes = useStyles();
-  const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("sm"));
 
-  const [anchor, setAnchor] = useState(null);
+  const [menu, setMenu] = useState({
+    anchorEl: null,
+    targetComponent: null,
+    menuType: null,
+    isOpen: false,
+  });
 
-  const handleMenuOpen = (e) => {
-    setAnchor(e.currentTarget);
+  const openMenu = (event, targetComponent, menuType) => {
+    setMenu({
+      anchorEl: event.currentTarget,
+      targetComponent: targetComponent,
+      menuType,
+      isOpen: true,
+    });
   };
 
-  const handleMenuClose = () => {
-    setAnchor(null);
+  const closeMenu = () => {
+    setMenu({
+      anchorEl: null,
+      targetComponent: null,
+      menuType: null,
+      isOpen: false,
+    });
   };
 
-  const isMenuOpen = (name) => {
-    if (Boolean(anchor)) {
-      if (anchor.id.split("-")[0] === name) {
-        return true;
-      } else return false;
-    }
-    return false;
+  const MyMenu = (props) => {
+    return (
+      <Popover
+        elevation={3}
+        getContentAnchorEl={null}
+        anchorEl={menu.anchorEl}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        open={menu.isOpen}
+        onClose={closeMenu}
+        {...props}
+      >
+        {menu.targetComponent}
+      </Popover>
+    );
   };
 
   return (
     <AppBar className={classes.root} position="fixed" elevation={1}>
       <Container maxWidth="lg" disableGutters={true}>
         <Toolbar className={classes.toolbar}>
-          {/* <Greetings className={classes.userGreetings}/>          */}
-
-          <IconButton
-            id="new-button"
+          <Button
             className={classes.button}
-            onClick={handleMenuOpen}
-            children={<AddIcon />}
-          />
-          <IconButton
-            id="filter-button"
-            className={classes.button}
-            onClick={handleMenuOpen}
-            children={<FilterListIcon />}
-          />
-          <IconButton
-            id="notification-button"
-            className={classes.button}
-            onClick={handleMenuOpen}
-            children={<NotificationsIcon />}
+            startIcon={<FilterListIcon />}
+            onClick={(e) => openMenu(e, <Filter />)}
+            children="Filter"
           />
 
           <Button
-            id="user-button"
-            size="large"
-            color="inherit"
             className={classes.button}
-            onClick={handleMenuOpen}
+            startIcon={<NotificationsIcon />}
+            onClick={(e) => openMenu(e, <Notification />)}
+            children="Notification"
+          />
+
+          <Button
+            className={classes.button}
             startIcon={<PersonIcon />}
-          >
-            {Boolean(userData) ? userData.displayName : "Login"}
-          </Button>
+            onClick={(e) => openMenu(e, <Account />)}
+            children={userData.displayName}
+          />
 
-          <Dialog
-            elevation={3}
-            open={isMenuOpen("new")}
-            fullWidth={matches}
-            fullScreen={!matches}
-            onClose={handleMenuClose}
-            scroll="paper"
-          >
-            <NewPost closeHandler={handleMenuClose} />
-          </Dialog>
-
-          <Popover
-            elevation={3}
-            getContentAnchorEl={null}
-            anchorEl={anchor}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            open={isMenuOpen("filter")}
-            onClose={handleMenuClose}
-          >
-            <Filter />
-          </Popover>
-
-          <Popover
-            elevation={3}
-            getContentAnchorEl={null}
-            anchorEl={anchor}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            open={isMenuOpen("notification")}
-            onClose={handleMenuClose}
-          >
-            <Notification />
-          </Popover>
-
-          {Boolean(userData) ? (
-            <Popover
-              elevation={3}
-              getContentAnchorEl={null}
-              anchorEl={anchor}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              open={isMenuOpen("user")}
-              onClose={handleMenuClose}
-            >
-              <User closeHandler={handleMenuClose} />
-            </Popover>
-          ) : (
-            <Dialog
-              open={isMenuOpen("user")}
-              onClose={handleMenuClose}
-              fullWidth={matches}
-              fullScreen={!matches}
-              className={classes.dialog}
-            >
-              <SignInSignUp closeHandler={handleMenuClose} />
-            </Dialog>
-          )}
-          {loading && <LoadingProgress />}
+          {menu.isOpen && <MyMenu />}
         </Toolbar>
       </Container>
     </AppBar>
@@ -184,4 +123,4 @@ const mapStateToProps = (state) => ({
   loading: state.user.loading,
 });
 
-export default connect(mapStateToProps, null)(Navbar);
+export default connect(mapStateToProps)(Navbar);

@@ -9,13 +9,17 @@ import {
   signUpSuccess,
   signOutSuccess,
   signOutFailure,
-  checkUserSession,
+
 } from "./user.actions";
+
+
 
 import { auth, firestore, getCurrentUser } from "../../util/firebase";
 
+
 export function* signInWithEmailAndPassword({ payload: { email, password } }) {
   try {
+    //displayProgressCircle("Signing In")
     const { user } = yield auth.signInWithEmailAndPassword(email, password);
 
     const userData = {
@@ -23,8 +27,6 @@ export function* signInWithEmailAndPassword({ payload: { email, password } }) {
       email: user.email,
       displayName: user.displayName,
     };
-
- 
 
     yield put(signInSuccess(userData));
   } catch (error) {
@@ -39,7 +41,6 @@ export function* signUpWithEmailAndPassword({
     const { user } = yield auth.createUserWithEmailAndPassword(email, password);
     yield user.updateProfile({ displayName });
 
- 
     yield firestore.collection("users").doc(user.uid).set({
       displayName,
       email: user.email,
@@ -48,6 +49,7 @@ export function* signUpWithEmailAndPassword({
     });
 
     yield put(signUpSuccess({ email, displayName, userId: user.uid }));
+    yield put()
   } catch (error) {
     yield put(signUpFailure(error.code));
   }
@@ -57,22 +59,25 @@ export function* signOutStart() {
   try {
     yield auth.signOut();
 
-
-
-    yield put(signOutSuccess());
+    yield put(signOutSuccess());    
   } catch (error) {
     yield put(signOutFailure(error.code));
   }
 }
 
-export function* isUserAuthenticated(){
+export function* isUserAuthenticated() {
   try {
-      const userAuth = yield getCurrentUser();
-      if (!userAuth) return;
-      yield put(signInSuccess({email: userAuth.email, displayName:userAuth.displayName, userId: userAuth.uid}));
-      
+    const userAuth = yield getCurrentUser();
+    if (!userAuth) return;
+    yield put(
+      signInSuccess({
+        email: userAuth.email,
+        displayName: userAuth.displayName,
+        userId: userAuth.uid,
+      })
+    );
   } catch (error) {
-      yield put(signInFailure(error))
+    yield put(signInFailure(error));
   }
 }
 
@@ -89,7 +94,7 @@ export function* onSignOutStart() {
 }
 
 export function* onCheckUserSession() {
-  yield takeLatest(userActionTypes.CHECK_USER_SESSION,isUserAuthenticated)
+  yield takeLatest(userActionTypes.CHECK_USER_SESSION, isUserAuthenticated);
 }
 
 export function* userSagas() {
@@ -97,6 +102,7 @@ export function* userSagas() {
     call(onSignInWithEmailPassword),
     call(onSignUpWithEmailAndPassword),
     call(onSignOutStart),
-    call(onCheckUserSession)
+    call(onCheckUserSession),
+ 
   ]);
 }
