@@ -23,7 +23,7 @@ export function* signInWithEmailAndPassword({ payload: { email, password } }) {
     const { user } = yield auth.signInWithEmailAndPassword(email, password);
 
     const userData = {
-      userId: user.uid,
+      id: user.uid,
       email: user.email,
       displayName: user.displayName,
     };
@@ -42,13 +42,12 @@ export function* signUpWithEmailAndPassword({
     yield user.updateProfile({ displayName });
 
     yield firestore.collection("users").doc(user.uid).set({
-      displayName,
-      email: user.email,
-      userId: user.uid,
+      displayName : user.displayName,
+      email: user.email,      
       createdAt: user.metadata.creationTime,
     });
 
-    yield put(signUpSuccess({ email, displayName, userId: user.uid }));
+    yield put(signUpSuccess({ email, displayName, id: user.uid }));
     yield put()
   } catch (error) {
     yield put(signUpFailure(error.code));

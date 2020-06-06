@@ -64,8 +64,8 @@ export const fetchOg = async (uri) => {
   }
 };
 
-export const getNameFromId = (userArray, id) => {
-  const user = userArray.find((user) => user.userId === id);
+export const getNameFromId = (list, id) => {
+  const user = list.find((user) => user.userId === id);
   return user.displayName;
 };
 
@@ -75,9 +75,25 @@ export const getNamesFromIds = (userArray, sharedArray) => {
   return result;
 };
 
+export const getPostOwnerName = (list, id ) => getNameFromId(list, id);
+
+
 
 export const getSharedUserArray = (userList, shareWith) => {
-  if (shareWith.includes('public')) return ['Everyone']
-  else if (shareWith.includes('me')) return ['Only Me']
+  if (shareWith.includes('public')) return ['public']
+  else if (shareWith.includes('me')) return ['me']
   else return getNamesFromIds(userList, shareWith)
 }
+
+
+export const dates = ( statusDates ) => {
+  
+  const createdDate = dayjs(statusDates[0].date).format("MMM DD, YYYY");
+  const currentStatus = statusDates.slice(-1);
+
+  return {
+    createdDate,
+    currentStatus
+  }
+}
+

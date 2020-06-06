@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import "./App.css";
 
 import {
@@ -10,17 +10,28 @@ import {
 import Navbar from "./components/NavBar/Navbar";
 import Home from "./Pages/Home/Home";
 
-import { connect } from "react-redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+
 import { checkUserSession } from "./redux/user/user.actions";
+import { fetchUsersStart } from "./redux/users/users.actions";
+
 import Loading from "./components/common/Loading";
 import SignInSignUp from "./Pages/SignInSignUp/SignInSignUp";
 
-import { fetchUsersStart } from "./redux/users/users.actions";
 
-function App({ checkUserSession, userLoading, userData, fetchUsers }) {
+function App() {
+
+
+  const dispatch = useDispatch();
+  const fetchUsers = () => dispatch(fetchUsersStart());
+  const checkUser = useCallback( () => dispatch(checkUserSession()), [dispatch])
+
+  const userData = useSelector( state => state.user.userData, shallowEqual);
+  const userLoading = useSelector(state => state.user.loading)
+
   useEffect(() => {
-    checkUserSession();
-  }, [checkUserSession]);
+    checkUser();
+  }, [checkUser]);
 
   Boolean(userData) && fetchUsers();
 
@@ -34,7 +45,7 @@ function App({ checkUserSession, userLoading, userData, fetchUsers }) {
         <Route exact path='/post/:id' component={Post} />         */}
           <Route
             exact
-            path="/signin"
+            path="/"
             render={() =>
               Boolean(userData) ? <Home/> : <SignInSignUp />
             }
@@ -46,14 +57,5 @@ function App({ checkUserSession, userLoading, userData, fetchUsers }) {
   );
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  checkUserSession: () => dispatch(checkUserSession()),
-  fetchUsers: () => dispatch(fetchUsersStart()),
-});
 
-const mapStateToProps = (state) => ({
-  userData: state.user.userData,
-  userLoading: state.user.loading,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

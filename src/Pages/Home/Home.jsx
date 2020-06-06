@@ -8,6 +8,8 @@ import { connect } from "react-redux";
 import ViewPost from "../../components/Post/ViewPost";
 import { fetchPostsStart } from "../../redux/posts/posts.actions";
 
+import { UsersProvider } from '../../contexts/UsersProvider'
+
 //import Post from "./Post/Post";
 
 // const initialOrder = {
@@ -20,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = ({ fetchPosts, userData, posts, isLoading }) => {
+const Home = ({ fetchPosts, postCollection, isLoading }) => {
   /*
   Condition
   1. Fetch post: user sign in / out, new post, delete post
@@ -31,6 +33,8 @@ const Home = ({ fetchPosts, userData, posts, isLoading }) => {
 
   // fetch data from database with filter and
 
+
+
   const classes = useStyles();
 
   useEffect(() => {
@@ -38,17 +42,19 @@ const Home = ({ fetchPosts, userData, posts, isLoading }) => {
   }, []);
 
   return (
+    <UsersProvider>
     <Container
       className={classes.homeComponent}
       maxWidth="sm"
       disableGutters={true}
     >
       {!isLoading ? (
-        posts.map((post) => <ViewPost key={post.id} postContent={post} />)
+        postCollection.map((postDocument) => <ViewPost key={postDocument.id} postContent={postDocument} />)
       ) : (
         <p>loading</p>
       )}
     </Container>
+    </UsersProvider>
   );
 };
 
@@ -58,7 +64,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = (state) => ({
   userData: state.user.userData,
-  posts: state.posts.posts,
+  postCollection: state.posts.postCollection,
   isLoading: state.posts.isLoading
 });
 

@@ -35,8 +35,9 @@ const PostStatus = ({ status }) => {
   const statusColor = statusColors[type];  
 
   const classes = useStyles({ statusColor });
- 
-  return (
+  
+  if (type === 'created') return <div></div>
+  else return (
   
     <Button
       key={status}

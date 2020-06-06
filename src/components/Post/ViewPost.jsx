@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core";
 
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-
-import { connect } from "react-redux";
 
 import Tags from "./Tags";
 import PostLink from "./PostLink";
@@ -13,9 +11,8 @@ import PostStatus from "./PostStatus";
 import ShareWith from "./ShareWith";
 import PostHeader from "./PostHeader";
 
-import { getSharedUserArray, getNameFromId } from "../../util";
+import PropTypes from "prop-types";
 
-import dayjs from "dayjs";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,26 +22,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ViewPost = ({ postContent, userList }) => {
-  const { id, post, link, shareWith, statusDates, tags } = postContent;
-
+const ViewPost = ({ postContent }) => {
   const classes = useStyles();
 
-  const createdDate = dayjs(statusDates[0].date).format("MMM DD, YYYY");
-  const displayName = getNameFromId(userList, post.userId);
-  const sharedUserArray = getSharedUserArray(userList, shareWith);
+  const {
+    id,
+    authorId,
+    statusDates,
+    memo,
+    link,
+    tags,
+    shareWith,
+  } = postContent;
+
 
   return (
-    <Card key={id} id={id} className={classes.root}>
-      <PostHeader createdDate={createdDate} displayName={displayName} />
+    <Card key={id} className={classes.root}>
+      <PostHeader
+        authorId={authorId}
+        postId={id}
+        createdDate={statusDates[0]}
+      />
       <CardContent>
-        <PostStatus status={statusDates.slice(-1)} />
-        <ShareWith sharedUserArray={sharedUserArray} />
+        {/* <PostStatus status={statusDates.splice(-1)} /> */}
+        <ShareWith sharedUserArray={shareWith} id={id} />
         <Typography
           variant="body2"
           color="textSecondary"
           component="p"
-          children={post.memo}
+          children={memo}
         />
       </CardContent>
 
@@ -57,8 +63,7 @@ const ViewPost = ({ postContent, userList }) => {
   );
 };
 
-const mapStateToProps = (state, ownProps) => ({
-  userList: state.users.userList,
-  postContent: ownProps.postContent,
-});
-export default connect(mapStateToProps)(ViewPost);
+ViewPost.propTypes = {
+  postContent: PropTypes.object }
+
+export default ViewPost;

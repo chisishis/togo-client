@@ -14,12 +14,28 @@ const fetchPostsFailure = (error) => ({
   payload: error
 })
 
+const updatePostStart = (updatedCollectionWithIndex) => ({
+  type: postsActionTypes.UPDATE_POST_START,
+  payload: updatedCollectionWithIndex
+})
 
+const updatePostSuccess = (updatedPostCollection) => ({
+  type: postsActionTypes.UPDATE_POST_SUCCESS,
+  payload: updatedPostCollection
+})
+
+const updatePostFailure = (error) => ({
+  type: postsActionTypes.UPDATE_POST_FAILURE,
+  payload: error
+})
 
 export {
   
   fetchPostsStart,
   fetchPostsSuccess,
   fetchPostsFailure,
+  updatePostStart,
+  updatePostSuccess,
+  updatePostFailure
 
 };

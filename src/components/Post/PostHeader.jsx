@@ -1,32 +1,42 @@
 import React from "react";
-import { connect } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import CardHeader from "@material-ui/core/CardHeader";
+import PropTypes from "prop-types";
 
-import PostActionButton from "./PostActionButton";
+import PostAction from "./PostAction";
 import PostAvatar from "./PostAvatar";
+import { useUsers } from "../../contexts/UsersProvider";
 
 const PostHeader = ({
+  authorId,
   postId,
-  loggedInName,
-  createdDate,
-  displayName,
-  users,
+  createdDate
 }) => {
+
+  const users = useUsers();
+  const curentUserId = useSelector(
+    (state) => state.user.userData.id,
+    shallowEqual
+  );
+    
+  const postOwnerName = users.getDisplayName(authorId)
+  
   return (
     <CardHeader
-      avatar={<PostAvatar displayName={displayName} />}
-      action={displayName === loggedInName && <PostActionButton />}
-      title={displayName}
-      subheader={createdDate}
+      avatar={<PostAvatar name={postOwnerName[0]} />}
+      action={
+        curentUserId === authorId && <PostAction postIndex={postId} />
+      }
+      title={postOwnerName}
+      subheader={createdDate.date}
     />
   );
 };
 
-const mapStatesToProps = (state, ownProps) => ({
-  users: state.users,
-  loggedInName: state.user.userData.displayName,
-  displayName: ownProps.displayName,
-  createdDate: ownProps.createdDate,
-});
+PostHeader.propTypes = {
+  authorId: PropTypes.string.isRequired,
+  postId: PropTypes.string.isRequired,
+  createdDate: PropTypes.object.isRequired
+};
 
-export default connect(mapStatesToProps)(PostHeader);
+export default PostHeader;
