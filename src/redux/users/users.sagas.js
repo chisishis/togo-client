@@ -10,8 +10,7 @@ export function* fecthUsers() {
   try {
     const collectionRef = firestore.collection("users");
     const snapShot = yield collectionRef.get();
-    const usersList = snapShot.docs.map((user) => ({
-      id: user.id,
+    const usersList = snapShot.docs.map((user) => ({      
       ...user.data(),
     }));
 

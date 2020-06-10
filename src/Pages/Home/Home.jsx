@@ -49,7 +49,7 @@ const Home = ({ fetchPosts, postCollection, isLoading }) => {
       disableGutters={true}
     >
       {!isLoading ? (
-        postCollection.map((postDocument) => <ViewPost key={postDocument.id} postContent={postDocument} />)
+        postCollection.map((post) => <ViewPost key={post.id} post={post} />)
       ) : (
         <p>loading</p>
       )}
@@ -62,8 +62,7 @@ const mapDispatchToProps = (dispatch) => ({
   fetchPosts: () => dispatch(fetchPostsStart()),
 });
 
-const mapStateToProps = (state) => ({
-  userData: state.user.userData,
+const mapStateToProps = (state) => ({  
   postCollection: state.posts.postCollection,
   isLoading: state.posts.isLoading
 });

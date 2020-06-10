@@ -16,6 +16,10 @@ import PublicIcon from "@material-ui/icons/Public";
 import GroupIcon from "@material-ui/icons/Group";
 import { useUsers } from "../../contexts/UsersProvider";
 
+import { useDispatch } from "react-redux";
+import { updatePostStart } from "../../redux/posts/posts.actions";
+import { useUpdatedPostCollection } from "../../hooks/useUpdatedPostCollection";
+
 const TrimmedButton = ({ array, clickHandler }) => {
   const users = useUsers();
   const [icon, text] = users.ShortenedArray(array);
@@ -34,6 +38,12 @@ const ShareWith = ({ sharedUserArray, id }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isDialogOpen, setDialog] = useState(false);
 
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const updatedPostCollectionWithIndex =  useUpdatedPostCollection(id, 'shareWith' , selectedUsers);
+
+  const dispatch = useDispatch(); 
+
+
   const openMenu = (e) => {
     setAnchorEl(e.currentTarget);
   };
@@ -51,6 +61,21 @@ const ShareWith = ({ sharedUserArray, id }) => {
     setDialog(false);
   };
 
+  const changeToPublic = () => {
+    setSelectedUsers(['999999'])
+    console.log(updatedPostCollectionWithIndex)
+    dispatch(updatePostStart(updatedPostCollectionWithIndex));    
+    setDialog(false);
+  }
+
+
+  const changeToPrivate = () => {
+    setSelectedUsers(['000000'])
+    console.log(updatedPostCollectionWithIndex)
+    dispatch(updatePostStart(updatedPostCollectionWithIndex));    
+    setDialog(false);
+  }
+
   return (
     <React.Fragment>
       <TrimmedButton
@@ -65,14 +90,14 @@ const ShareWith = ({ sharedUserArray, id }) => {
         open={Boolean(anchorEl)}
         onClose={closeMenu}
       >
-        <MenuItem>
+        <MenuItem onClick={changeToPrivate}>
           <ListItemIcon>
             <LockIcon fontSize="small" />
           </ListItemIcon>
           <Typography variant="inherit">Only Me</Typography>
         </MenuItem>
 
-        <MenuItem>
+        <MenuItem onClick={changeToPublic}>
           <ListItemIcon>
             <PublicIcon fontSize="small" />
           </ListItemIcon>
@@ -86,12 +111,15 @@ const ShareWith = ({ sharedUserArray, id }) => {
           <Typography variant="inherit">Share With..</Typography>
         </MenuItem>
       </Menu>
-      <UserSelectDialog
+      {
+        isDialogOpen &&  <UserSelectDialog
         sharedUserArray={sharedUserArray}
         openHandler={isDialogOpen}
         closeHandler={closeDialog}
         id= {id}        
       />
+      }
+     
     </React.Fragment>
   );
 };

@@ -17,6 +17,7 @@ import Notification from "../Menu/Notification";
 import Account from "../Account/Account";
 
 import { connect } from "react-redux";
+import { useDialogSize } from "../../hooks/useDialogSize";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
  */
 const Navbar = ({ userData }) => {
   const classes = useStyles();
+  const displaySize = useDialogSize()
 
   const [menu, setMenu] = useState({
     anchorEl: null,

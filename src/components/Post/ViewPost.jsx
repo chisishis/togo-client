@@ -19,11 +19,18 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2),
     maxWidth: "100%",
     borderRadius: 8,
+    [theme.breakpoints.down('sm')]: {
+      margin: '20px 0',
+      borderRadius: 0
+    }
   },
+
+  
 }));
 
-const ViewPost = ({ postContent }) => {
+const ViewPost = ({ post }) => {
   const classes = useStyles();
+  
 
   const {
     id,
@@ -33,8 +40,7 @@ const ViewPost = ({ postContent }) => {
     link,
     tags,
     shareWith,
-  } = postContent;
-
+  } = post;
 
   return (
     <Card key={id} className={classes.root}>
@@ -42,6 +48,8 @@ const ViewPost = ({ postContent }) => {
         authorId={authorId}
         postId={id}
         createdDate={statusDates[0]}
+        tags = {tags}
+        memo = {memo}
       />
       <CardContent>
         {/* <PostStatus status={statusDates.splice(-1)} /> */}

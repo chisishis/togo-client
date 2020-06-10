@@ -1,13 +1,23 @@
 import { takeLatest, call, put, all } from "redux-saga/effects";
 import postsActionTypes from "./posts.types";
-import { fetchPostsSuccess, fetchPostsFailure, updatePostSuccess, updatePostFailure } from "./posts.actions";
+import {
+  fetchPostsSuccess,
+  fetchPostsFailure,
+  updatePostSuccess,
+  updatePostFailure,
+  deletePostSuccess,
+  deletePostFailure,
+} from "./posts.actions";
 import { firestore } from "../../util/firebase";
 
 export function* fetchPosts() {
   try {
     const collectionRef = firestore.collection("posts");
     const querySnapshot = yield collectionRef.get();
-    const posts = querySnapshot.docs.map( (doc) => ({ id: doc.id, ...doc.data() }));
+    const posts = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
     yield put(fetchPostsSuccess(posts));
   } catch (error) {
@@ -15,22 +25,29 @@ export function* fetchPosts() {
   }
 }
 
-export function* updatePost({payload: {updatedPostCollection, index}}) {
+export function* updatePost({ payload: updatedObjectWithIndex }) {
   try {
-
-    console.log (updatedPostCollection, index);
+    const { id, objectKey, objectValue } = updatedObjectWithIndex;
     const collectionRef = firestore.collection("posts");
-    const documentRef = yield collectionRef.doc(updatedPostCollection[index].id);
+    const documentRef = yield collectionRef.doc(id);
 
-    yield documentRef.update(updatedPostCollection[index])  
+    yield documentRef.update({ [objectKey]: objectValue });
+    yield put(updatePostSuccess(updatedObjectWithIndex));
 
-
-    yield put(updatePostSuccess(updatedPostCollection));
   } catch (error) {
-    yield put(updatePostFailure(error))
+    yield put(updatePostFailure(error));
   }
-
 }
+
+export function* deletePost({payload: postId}) {
+  
+  try {
+    yield  put(deletePostSuccess(postId))
+  } catch (error) {
+    yield put(deletePostFailure(error))
+  }
+}
+
 
 
 export function* onFetchPost() {
@@ -38,11 +55,14 @@ export function* onFetchPost() {
 }
 
 export function* onUpdatePost() {
+
   yield takeLatest(postsActionTypes.UPDATE_POST_START, updatePost);
 }
 
+export function* onDeletePost() {
+  yield takeLatest(postsActionTypes.DELETE_POST_START, deletePost);
+}
+
 export function* postsSagas() {
-  yield all([
-    call(onFetchPost),
-    call(onUpdatePost)])
+  yield all([call(onFetchPost), call(onUpdatePost), call(onDeletePost)]);
 }

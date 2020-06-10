@@ -23,7 +23,7 @@ export function* signInWithEmailAndPassword({ payload: { email, password } }) {
     const { user } = yield auth.signInWithEmailAndPassword(email, password);
 
     const userData = {
-      id: user.uid,
+      id: user.id,
       email: user.email,
       displayName: user.displayName,
     };
@@ -42,6 +42,7 @@ export function* signUpWithEmailAndPassword({
     yield user.updateProfile({ displayName });
 
     yield firestore.collection("users").doc(user.uid).set({
+      id: user.uid,
       displayName : user.displayName,
       email: user.email,      
       createdAt: user.metadata.creationTime,

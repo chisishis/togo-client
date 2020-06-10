@@ -3,8 +3,45 @@ import PropTypes from "prop-types";
 
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+
+import { makeStyles } from "@material-ui/core/styles";
+
+
+
+
+const useStyles = makeStyles(theme =>({
+  
+  general : {
+    backgroundColor: '#2196f3',
+    color: '#fff'
+  },
+
+  warning : {
+    backgroundColor: '#ff5722'
+  },
+
+  default : {
+    backgroundColor: 'inherit'
+  }
+
+
+}))
+
+
 const MyDialogTitle = ({ type, text, id }) => {
-  return <DialogTitle id={id}>{text}</DialogTitle>;
+
+  const classes = useStyles()
+
+  const titleType = () => {
+    switch (type) {
+      case 'general' : return classes.general
+    
+    case 'warning' : return classes.warning;
+    default : return classes.default
+  } 
+}
+
+  return <DialogTitle className={titleType()} id={id}>{text}</DialogTitle>;
 };
 
 MyDialogTitle.propTypes = {

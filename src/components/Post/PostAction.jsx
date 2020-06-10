@@ -5,16 +5,19 @@ import Menu from "@material-ui/core/Menu";
 import ScheduleIcon from "@material-ui/icons/Schedule";
 import DeleteIcon from "@material-ui/icons/Delete";
 
-import EditTag from '../EditTag/EditTag'
-import EditMemo from '../EditMemo/EditMemo'
-import DeletePost from '../DeletePost/DeletePost'
+import EditTag from "../EditTag/EditTag";
+import EditMemo from "../EditMemo/EditMemo";
+import DeletePost from "../DeletePost/DeletePost";
 
 import PostActionButton from "./PostActionButton";
 
-import PostActionMenuItem from "./PostActionMenuItem";
 
-const PostAction = () => {
+import MenuItem from "@material-ui/core/MenuItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import LabelIcon from "@material-ui/icons/Label";
 
+const PostAction = ({ postId, tags, memo }) => {
   const [anchorEl, setAnchorEl] = useState(null); // Side Menu Elements
   const [dialog, setDialog] = useState(null);
 
@@ -57,30 +60,41 @@ const PostAction = () => {
         open={Boolean(anchorEl)}
         onClose={closeMenu}
       >
-        <PostActionMenuItem
-          text="Edit Tag"
-          openHandler={openDialog("tag")}
-          closeHandler={closeDialog}
-        />
-        <PostActionMenuItem
-          text="Edit Memo"
-          openHandler={openDialog("memo")}
-          closeHandler={closeDialog}
-        />
-        <PostActionMenuItem
-          text="Delete Post"
-          openHandler={openDialog("delete")}
-          closeHandler={closeDialog}
-        />
+        <MenuItem onClick={openDialog("tag")}>
+          <ListItemIcon>
+            <LabelIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={"Edit Tag"} />
+        </MenuItem>
 
-        <EditTag open={dialog === 'tag'} closeHandler={closeDialog} />
-        <EditMemo open={dialog === 'memo'} closeHandler={closeDialog} />
-        <DeletePost open={dialog === 'delete'} closeHandler={closeDialog} />
+        <MenuItem onClick={openDialog("memo")}>
+          <ListItemIcon>
+            <LabelIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={"Edit Memo"} />
+        </MenuItem>
 
+        <MenuItem onClick={openDialog("delete")}>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={"Delete Post"} />
+        </MenuItem>
 
+        <EditTag
+          open={dialog === "tag"}
+          closeHandler={closeDialog}
+          tags={tags}
+          postId={postId}
+        />
+        <EditMemo
+          open={dialog === "memo"}
+          closeHandler={closeDialog}
+          memo={memo}
+          postId={postId}
+        />
+        <DeletePost open={dialog === "delete"} closeHandler={closeDialog} postId={postId} />
       </Menu>
-
-      
     </div>
   );
 };

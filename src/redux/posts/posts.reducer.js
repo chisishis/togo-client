@@ -5,15 +5,10 @@ const INITIAL_STATE = {
   postCollection: null,
   isLoading: true,
   error: false,
-  isUpdating: false
+  isUpdating: false,
 };
 
-
-
 const postsRecuder = (state = INITIAL_STATE, action) => {
-
-
-
   switch (action.type) {
     case postsActionTypes.FETCH_POSTS_START:
       return {
@@ -34,19 +29,47 @@ const postsRecuder = (state = INITIAL_STATE, action) => {
         error: action.payload,
       };
 
-      case postsActionTypes.UPDATE_POST_START:
+    case postsActionTypes.UPDATE_POST_START:
       return {
         ...state,
-        isUpdating: true      
+        isUpdating: true,
       };
 
     case postsActionTypes.UPDATE_POST_SUCCESS:
       return {
-        ...state,        
+        ...state,
         isUpdating: false,
-        postCollection: action.payload
+        postCollection: state.postCollection.map((post) => {
+          const { id, objectKey, objectValue } = action.payload;
+
+          if (post.id === id) {
+            return { ...post, [objectKey]: objectValue };
+          } else {
+            return post;
+          }
+        }),
       };
     case postsActionTypes.UPDATE_POST_FAILURE:
+      return {
+        ...state,
+        isUpdating: false,
+        error: action.payload,
+      };
+
+    case postsActionTypes.DELETE_POST_START:
+      return {
+        ...state,
+        isUPdating: true,
+      };
+
+    case postsActionTypes.DELETE_POST_SUCCESS:
+      return {
+        ...state,
+        isUpdating: false,
+        postCollection: state.postCollection.filter((post) => post.id !== action.payload && post)
+      };
+
+    case postsActionTypes.DELETE_POST_FAILURE:
       return {
         ...state,
         isUpdating: false,

@@ -14,20 +14,39 @@ const fetchPostsFailure = (error) => ({
   payload: error
 })
 
-const updatePostStart = (updatedCollectionWithIndex) => ({
+
+// updatedObjectWithIndex  = { id , objectKey. objectValue}
+const updatePostStart = (updatedObjectWithIndex) => ({
   type: postsActionTypes.UPDATE_POST_START,
-  payload: updatedCollectionWithIndex
+  payload: updatedObjectWithIndex
 })
 
-const updatePostSuccess = (updatedPostCollection) => ({
+const updatePostSuccess = (updatedObjectWithIndex) => ({
   type: postsActionTypes.UPDATE_POST_SUCCESS,
-  payload: updatedPostCollection
+  payload: updatedObjectWithIndex
 })
 
 const updatePostFailure = (error) => ({
   type: postsActionTypes.UPDATE_POST_FAILURE,
   payload: error
 })
+
+const deletePostStart = (postId) => ({
+  type: postsActionTypes.DELETE_POST_START,
+  payload: postId
+})
+
+const deletePostSuccess = (postId) => ({
+  type: postsActionTypes.DELETE_POST_SUCCESS,
+  payload: postId
+})
+
+const deletePostFailure = (error) => ({
+  type: postsActionTypes.DELETE_POST_FAILURE,
+  payload: error
+})
+
+
 
 export {
   
@@ -36,6 +55,9 @@ export {
   fetchPostsFailure,
   updatePostStart,
   updatePostSuccess,
-  updatePostFailure
+  updatePostFailure,
+  deletePostStart,
+  deletePostSuccess,
+  deletePostFailure
 
 };
